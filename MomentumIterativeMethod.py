@@ -10,10 +10,15 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from PIL import Image
+import glob
+import os
 import numpy as np
+import cv2
 import tensorflow as tf
 from tensorflow.python.platform import flags
 import logging
+from sklearn.model_selection import train_test_split
 
 from cleverhans.utils_mnist import data_mnist
 from cleverhans.utils_tf import model_train, model_eval
@@ -24,6 +29,45 @@ from cleverhans.utils import AccuracyReport, set_log_level
 import os
 
 FLAGS = flags.FLAGS
+
+
+def get_caltech101(data_dir="../../../101_ObjectCategories/"):
+    image_list = []
+    object_classes = [name for name in os.listdir(data_dir) if not name.startswith(".")]
+    image_collections = []
+    running_sum_x = 0
+    running_sum_y = 0
+    count = 0
+    labels = []
+    label = 0
+    for object_name in object_classes:
+        object_images = []
+        for filename in glob.glob(data_dir + '{}/*.jpg'.format(object_name)): 
+            im=Image.open(filename)
+            pix = np.array(im)
+            if len(pix.shape) < 3:
+                # grayscale image to RGB (3 dimension)
+                pix = cv2.cvtColor(pix, cv2.COLOR_GRAY2BGR) 
+            image_reshaped = cv2.resize(pix, (300, 244), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
+            object_images.append(image_reshaped)
+            labels.append(label)
+
+            # get the running sum for uniform shape
+            count += 1
+            running_sum_x += 1 / count * (pix.shape[0] - running_sum_x)
+            running_sum_y += 1 / count * (pix.shape[1] - running_sum_y)
+        
+        object_images = np.concatenate([object_[np.newaxis,:,:,:] for object_ in object_images])    
+        image_collections.append(object_images)
+        label += 1
+    print(running_sum_y, running_sum_x) # get the average shape
+        
+    X = np.concatenate(image_collections)    
+    Y = np.array(labels)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=8080) # shuffle is default
+
+    return X_train, X_test, y_train, y_test
 
 
 def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
@@ -70,10 +114,13 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     sess = tf.Session(config=tf.ConfigProto(**config_args))
 
     # Get MNIST test data
-    X_train, Y_train, X_test, Y_test = data_mnist(train_start=train_start,
-                                                  train_end=train_end,
-                                                  test_start=test_start,
-                                                  test_end=test_end)
+    #X_train, Y_train, X_test, Y_test = data_mnist(train_start=train_start,
+    #                                              train_end=train_end,
+    #                                              test_start=test_start,
+    #                                              test_end=test_end)
+
+    # TODO: average shape (None, 244, 300), figure out proper shape to CNN later
+    X_train, Y_train, X_test, Y_test = get_caltech101() 
 
     # Use label smoothing
     assert Y_train.shape[1] == 10
