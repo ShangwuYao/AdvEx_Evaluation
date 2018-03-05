@@ -60,6 +60,7 @@ def get_caltech101(data_dir="../../../101_ObjectCategories/"):
         object_images = np.concatenate([object_[np.newaxis,:,:,:] for object_ in object_images])    
         image_collections.append(object_images)
         label += 1
+
     print(running_sum_y, running_sum_x) # get the average shape
         
     X = np.concatenate(image_collections)    
