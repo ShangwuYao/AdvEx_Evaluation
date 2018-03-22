@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 from cleverhans.utils_mnist import data_mnist
 from cleverhans.utils_tf import model_train, model_eval
 from cleverhans.attacks import FastGradientMethod
-from cleverhans_tutorials.tutorial_models import make_basic_cnn
+from cleverhans_tutorials.tutorial_models import *
 from cleverhans.utils import AccuracyReport, set_log_level
 
 import os
@@ -31,7 +31,7 @@ import os
 FLAGS = flags.FLAGS
 
 
-def get_caltech101(data_dir="../../../101_ObjectCategories/"):
+def get_caltech101(data_dir="../101_ObjectCategories/"): # ../../../
     image_list = []
     object_classes = [name for name in os.listdir(data_dir) if not name.startswith(".")]
     image_collections = []
@@ -48,7 +48,7 @@ def get_caltech101(data_dir="../../../101_ObjectCategories/"):
             if len(pix.shape) < 3:
                 # grayscale image to RGB (3 dimension)
                 pix = cv2.cvtColor(pix, cv2.COLOR_GRAY2BGR) 
-            image_reshaped = cv2.resize(pix, (300, 244), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
+            image_reshaped = cv2.resize(pix, (128, 128), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
             object_images.append(image_reshaped)
             labels.append(label)
 
@@ -65,10 +65,28 @@ def get_caltech101(data_dir="../../../101_ObjectCategories/"):
         
     X = np.concatenate(image_collections)    
     Y = np.array(labels)
+    onehot = np.zeros((Y.shape[0], 102)) # 102 classes
+    onehot[np.arange(Y.shape[0]), Y] = 1
 
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=8080) # shuffle is default
+    X_train, X_test, y_train, y_test = train_test_split(X, onehot, test_size=0.20, random_state=8080) # shuffle is default
 
     return X_train, X_test, y_train, y_test
+
+
+def make_new_cnn(nb_filters=64, nb_classes=102,
+                   input_shape=(None, 128, 128, 3)):
+    layers = [Conv2D(nb_filters, (8, 8), (2, 2), "SAME"),
+              ReLU(),
+              Conv2D(nb_filters * 2, (6, 6), (2, 2), "VALID"),
+              ReLU(),
+              Conv2D(nb_filters * 2, (5, 5), (1, 1), "VALID"),
+              ReLU(),
+              Flatten(),
+              Linear(nb_classes),
+              Softmax()]
+
+    model = MLP(layers, input_shape)
+    return model    
 
 
 def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
@@ -120,17 +138,16 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     #                                              test_start=test_start,
     #                                              test_end=test_end)
 
-    # TODO: average shape (None, 244, 300), figure out proper shape to CNN later
-    X_train, Y_train, X_test, Y_test = get_caltech101() 
+    X_train, X_test, Y_train, Y_test = get_caltech101() 
 
     # Use label smoothing
-    assert Y_train.shape[1] == 10
+    assert Y_train.shape[1] == 102
     label_smooth = .1
     Y_train = Y_train.clip(label_smooth / 9., 1. - label_smooth)
 
     # Define input TF placeholder
-    x = tf.placeholder(tf.float32, shape=(None, 28, 28, 1))
-    y = tf.placeholder(tf.float32, shape=(None, 10))
+    x = tf.placeholder(tf.float32, shape=(None, 128, 128, 3))
+    y = tf.placeholder(tf.float32, shape=(None, 102))
 
     model_path = "models/mnist"
     # Train an MNIST model
@@ -146,7 +163,7 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     rng = np.random.RandomState([2017, 8, 30])
 
     if clean_train:
-        model = make_basic_cnn(nb_filters=nb_filters)
+        model = make_new_cnn(nb_filters=nb_filters)
         preds = model.get_probs(x)
 
         def evaluate():
@@ -189,7 +206,7 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
 
         print("Repeating the process, using adversarial training")
     # Redefine TF model graph
-    model_2 = make_basic_cnn(nb_filters=nb_filters)
+    model_2 = make_new_cnn(nb_filters=nb_filters)
     preds_2 = model_2(x)
     mim2 = MomentumIterativeMethod(model_2, sess=sess)
     adv_x_2 = mim2.generate(x, **mim_params)
