@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 
 from cleverhans.utils_mnist import data_mnist
 from cleverhans.utils_tf import model_train, model_eval
-from cleverhans.attacks import FastGradientMethod
+from cleverhans.attacks import MomentumIterativeMethod
 from cleverhans_tutorials.tutorial_models import *
 from cleverhans.utils import AccuracyReport, set_log_level
 
@@ -156,10 +156,9 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
         'batch_size': batch_size,
         'learning_rate': learning_rate
     }
-    mim_params = {'eps': 0.3, 'eps_iter': 0.06, 'nb_iter': 10, 'y': None,
+    mim_params = {'eps': 0.3, 'eps_iter': 0.06, 'nb_iter': 10, 
                      'ord': np.inf, 'decay_factor': 1.0,
-                     'clip_min': 0., 'clip_max': 1.,
-                     'y_target': None}
+                     'clip_min': 0., 'clip_max': 1.}
     rng = np.random.RandomState([2017, 8, 30])
 
     if clean_train:
