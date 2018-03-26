@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,600|Material+Icons');
+
+
+
+body {
+  background-color: #eee;
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+}
+
+.main-container {
+  padding: 25px;
+}
+
+.splash-container {
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background-color: #fff;
+  margin-bottom: 25px;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, .04);
+  border-radius: 3px;
+  display: block;
+}
+
+.brand-border {
+  border-top: 3px solid #007bff;
+}
+
+.sidebar-sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  padding-top: .5rem;
+  padding-bottom: 2rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.sidebar {
+  padding: 0;
+}
+
+.navbar {
+  background-color: #fff;
+  border-bottom: 1px solid #e6e5e5;
+  height: 64px;
+}
+
+.navbar-brand img {
+  height: 32px;
+}
+
+.navbar-brand span {
+  vertical-align: middle;
+  font-size: large;
+  margin: 0 .6rem;
+  cursor: default;
+  font-weight: 600;
+}
+
+.sidebar .nav-link {
+  color: #333;
+}
+
+.sidebar .nav-link i {
+  vertical-align: bottom;
+  margin-right: .4rem;
+}
+
+.sidebar .nav-link.active {
+  color: #fff;
+  background-color: #007bff;
+}
+
+.sidebar .divider {
+  padding: 10px 1.2rem 5px;
+  font-size: small;
+  font-weight: 600;
+  color: #ccc;
+  text-transform: uppercase;
+}
+
+.content {
+  padding: 1rem;
+}
