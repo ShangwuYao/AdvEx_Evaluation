@@ -25,6 +25,7 @@ from cleverhans.utils_tf import model_train, model_eval
 from cleverhans.attacks import MomentumIterativeMethod
 from cleverhans_tutorials.tutorial_models import *
 from cleverhans.utils import AccuracyReport, set_log_level
+from model import AlexNet
 
 import os
 
@@ -48,7 +49,7 @@ def get_caltech101(data_dir="../101_ObjectCategories/"): # ../../../
             if len(pix.shape) < 3:
                 # grayscale image to RGB (3 dimension)
                 pix = cv2.cvtColor(pix, cv2.COLOR_GRAY2BGR) 
-            image_reshaped = cv2.resize(pix, (128, 128), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
+            image_reshaped = cv2.resize(pix, (256, 256), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
             object_images.append(image_reshaped)
             labels.append(label)
 
@@ -71,22 +72,6 @@ def get_caltech101(data_dir="../101_ObjectCategories/"): # ../../../
     X_train, X_test, y_train, y_test = train_test_split(X, onehot, test_size=0.20, random_state=8080) # shuffle is default
 
     return X_train, X_test, y_train, y_test
-
-
-def make_new_cnn(nb_filters=64, nb_classes=102,
-                   input_shape=(None, 128, 128, 3)):
-    layers = [Conv2D(nb_filters, (8, 8), (2, 2), "SAME"),
-              ReLU(),
-              Conv2D(nb_filters * 2, (6, 6), (2, 2), "VALID"),
-              ReLU(),
-              Conv2D(nb_filters * 2, (5, 5), (1, 1), "VALID"),
-              ReLU(),
-              Flatten(),
-              Linear(nb_classes),
-              Softmax()]
-
-    model = MLP(layers, input_shape)
-    return model    
 
 
 def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
@@ -146,7 +131,7 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     Y_train = Y_train.clip(label_smooth / 9., 1. - label_smooth)
 
     # Define input TF placeholder
-    x = tf.placeholder(tf.float32, shape=(None, 128, 128, 3))
+    x = tf.placeholder(tf.float32, shape=(None, 256, 256, 3))
     y = tf.placeholder(tf.float32, shape=(None, 102))
 
     model_path = "models/mnist"
@@ -159,12 +144,19 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     mim_params = {'eps': 0.3, 'eps_iter': 0.06, 'nb_iter': 10, 
                      'ord': np.inf, 'decay_factor': 1.0,
                      'clip_min': 0., 'clip_max': 1.}
+    bim_params = {'eps': 0.3, 'clip_min': 0., 'clip_max': 1.,
+                  'nb_iter': 50,
+                  'eps_iter': .01}   
+    fgsm_params = {'eps': 0.3,
+                   'clip_min': 0.,
+                   'clip_max': 1.}              
     rng = np.random.RandomState([2017, 8, 30])
 
     if clean_train:
-        model = make_new_cnn(nb_filters=nb_filters)
+        model = AlexNet()
         preds = model.get_probs(x)
 
+        saver = tf.train.Saver()
         def evaluate():
             # Evaluate the accuracy of the MNIST model on legitimate test
             # examples
@@ -174,6 +166,7 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
             report.clean_train_clean_eval = acc
             #assert X_test.shape[0] == test_end - test_start, X_test.shape
             print('Test accuracy on legitimate examples: %0.4f' % acc)
+            save_path = saver.save(sess, "./model_acc{}.ckpt".format(acc))
         model_train(sess, x, y, preds, X_train, Y_train, evaluate=evaluate,
                     args=train_params, rng=rng)
 
@@ -188,6 +181,11 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
         # graph
         mim = MomentumIterativeMethod(model, sess=sess)
         adv_x = mim.generate(x, **mim_params)
+
+        #bim = BasicIterativeMethod(model)
+        #adv_x = bim.generate(x, **bim_params)
+        #fgsm = FastGradientMethod(model, sess=sess)
+        #adv_x = fgsm.generate(x, **fgsm_params)
         preds_adv = model.get_probs(adv_x)
 
         # Evaluate the accuracy of the MNIST model on adversarial examples
@@ -205,10 +203,15 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
 
         print("Repeating the process, using adversarial training")
     # Redefine TF model graph
-    model_2 = make_new_cnn(nb_filters=nb_filters)
+    model_2 = AlexNet()
     preds_2 = model_2(x)
     mim2 = MomentumIterativeMethod(model_2, sess=sess)
     adv_x_2 = mim2.generate(x, **mim_params)
+    # TODO
+    #fgsm2 = FastGradientMethod(model_2, sess=sess)
+    #adv_x_2 = fgsm2.generate(x, **fgsm_params)
+    #bim2 = BasicIterativeMethod(model_2, sess=sess)
+    #adv_x_2 = bim.generate(x, **bim_params)
     if not backprop_through_attack:
         # For the fgsm attack used in this tutorial, the attack has zero
         # gradient so enabling this flag does not change the gradient.
@@ -261,10 +264,11 @@ def main(argv=None):
 
 if __name__ == '__main__':
     flags.DEFINE_integer('nb_filters', 64, 'Model size multiplier')
-    flags.DEFINE_integer('nb_epochs', 6, 'Number of epochs to train model')
-    flags.DEFINE_integer('batch_size', 128, 'Size of training batches')
+    flags.DEFINE_integer('nb_epochs', 20, 'Number of epochs to train model')
+    flags.DEFINE_integer('batch_size', 64, 'Size of training batches')
     flags.DEFINE_float('learning_rate', 0.001, 'Learning rate for training')
     flags.DEFINE_bool('clean_train', True, 'Train on clean examples')
+    flags.DEFINE_bool('load_pretrained', False, 'Train on clean examples')
     flags.DEFINE_bool('backprop_through_attack', False,
                       ('If True, backprop through adversarial example '
                        'construction process during adversarial training'))
