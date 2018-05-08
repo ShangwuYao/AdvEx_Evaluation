@@ -25,7 +25,7 @@ from cleverhans.utils_tf import model_train, model_eval
 from cleverhans.attacks import MomentumIterativeMethod
 from cleverhans_tutorials.tutorial_models import *
 from cleverhans.utils import AccuracyReport, set_log_level
-from model import AlexNet
+#from model import AlexNet
 from utils import get_caltech101
 
 import os
@@ -114,6 +114,9 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     if clean_train:
         model = AlexNet()
         preds = model.get_probs(x)
+        #model = VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000)
+        #preds = model(x)
+
 
         saver = tf.train.Saver()
         def evaluate():
