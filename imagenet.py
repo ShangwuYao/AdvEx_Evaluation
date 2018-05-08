@@ -24,7 +24,7 @@ from cleverhans.attacks import *
 from cleverhans.utils import AccuracyReport
 from cleverhans.utils_keras import cnn_model
 from cleverhans.utils_keras import KerasModelWrapper
-from utils import get_caltech101, make_vgg16
+from utils import get_caltech101, make_vgg16, get_imagenet
 from keras.preprocessing.image import load_img,img_to_array
 from keras.applications.vgg16 import VGG16,preprocess_input,decode_predictions
 from keras import backend as K
@@ -35,11 +35,11 @@ import time
 FLAGS = flags.FLAGS
 
 
-def run_caltech101(train_start=0, train_end=60000, test_start=0,
+def run_imagenet(train_start=0, train_end=60000, test_start=0,
                    test_end=10000, nb_epochs=6, batch_size=128,
-                   learning_rate=0.001, train_dir="./save_weights_caltech101",
-                   filename="caltech101.ckpt", load_model=False,
-                   testing=False, use_pretrained=False, nb_classes=102, source_samples=10):
+                   learning_rate=0.001, train_dir="./save_weights_imagenet",
+                   filename="imagenet.ckpt", load_model=False,
+                   testing=False, use_pretrained=True, nb_classes=200, source_samples=10):
     """
     MNIST CleverHans tutorial
     :param train_start: index of first training set example
@@ -55,8 +55,8 @@ def run_caltech101(train_start=0, train_end=60000, test_start=0,
     :param testing: if true, test error is calculated
     :return: an AccuracyReport object
     """
-    img_rows = 256
-    img_cols = 256
+    img_rows = 224
+    img_cols = 224
     channels = 3
 
     keras.layers.core.K.set_learning_phase(0)
@@ -85,7 +85,8 @@ def run_caltech101(train_start=0, train_end=60000, test_start=0,
     #                                              train_end=train_end,
     #                                              test_start=test_start,
     #                                              test_end=test_end)
-    X_train, X_test, Y_train, Y_test = get_caltech101() 
+    #X_train, X_test, Y_train, Y_test = get_caltech101() 
+    X_train, X_test, Y_train, Y_test = get_imagenet()
 
     # Use label smoothing
     label_smooth = .1
@@ -132,7 +133,7 @@ def run_caltech101(train_start=0, train_end=60000, test_start=0,
         print("------evaluating------")
         #evaluate() # commented for efficiency. uncomment later
     else:
-        print("------Model was not loaded, training from scratch.------")
+        print("------Model was not loaded, training from imagenet pretrained.------")
         model_train(sess, x, y, preds, X_train, Y_train, evaluate=evaluate,
                     args=train_params, save=True, rng=rng)
 
@@ -149,7 +150,7 @@ def run_caltech101(train_start=0, train_end=60000, test_start=0,
     attackmethod = None
     attack_params = None
 
-    method_string = 'jsma'
+    method_string = 'mim'
     print('-------attacking method:{}-------'.format(method_string))
 
     #wrap = KerasModelWrapper(model)
@@ -177,9 +178,14 @@ def run_caltech101(train_start=0, train_end=60000, test_start=0,
 
     print("accuracy: {}".format(accs / cnt))
 
+    # Close TF session
+    sess.close()
+
+    print("--- %s seconds ---" % (time.time() - start_time))    
+
 
 def main(argv=None):
-    run_caltech101(nb_epochs=FLAGS.nb_epochs,
+    run_imagenet(nb_epochs=FLAGS.nb_epochs,
                    batch_size=FLAGS.batch_size,
                    learning_rate=FLAGS.learning_rate,
                    train_dir=FLAGS.train_dir,
@@ -191,11 +197,11 @@ def main(argv=None):
 if __name__ == '__main__':
     flags.DEFINE_integer('nb_epochs', 15, 'Number of epochs to train model')
     flags.DEFINE_integer('batch_size', 32, 'Size of training batches')
-    flags.DEFINE_float('learning_rate', 0.001, 'Learning rate for training')
-    flags.DEFINE_string('train_dir', './save_weights_caltech101', 'Directory where to save model.')
-    flags.DEFINE_string('filename', 'caltech101.ckpt', 'Checkpoint filename.')
-    flags.DEFINE_boolean('load_model', True, 'Load saved model or train.')
-    flags.DEFINE_boolean('use_pretrained', False, 'Use pretrained model from imagenet or not.')
+    flags.DEFINE_float('learning_rate', 0.0001, 'Learning rate for training')
+    flags.DEFINE_string('train_dir', './save_weights_imagenet', 'Directory where to save model.')
+    flags.DEFINE_string('filename', 'imagenet.ckpt', 'Checkpoint filename.')
+    flags.DEFINE_boolean('load_model', False, 'Load saved model or train.')
+    flags.DEFINE_boolean('use_pretrained', True, 'Use pretrained model from imagenet or not.')
     tf.app.run()
 
 

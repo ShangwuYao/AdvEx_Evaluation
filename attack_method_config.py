@@ -15,13 +15,13 @@ ATTACK_DICT = {
 			'attack_params': {'eps':0.3, 'eps_iter':0.05, 'nb_iter':10}
 	},
 	'lbfgs': {'attackmethod': LBFGS,
-			'attack_params': {'batch_size':1,
+			'attack_params': {'batch_size':10,
 								 'binary_search_steps':5, 'max_iterations':1000,
 								 'initial_const':1e-2, 'clip_min':0, 'clip_max':1}
 	},
 	'enm': {'attackmethod': ElasticNetMethod,
 			'attack_params': {'fista':True, 'beta':1e-3,
-								 'decision_rule':'EN', 'batch_size':1, 'confidence':0,
+								 'decision_rule':'EN', 'batch_size':10, 'confidence':0,
 								 'learning_rate':1e-2,
 								 'binary_search_steps':9, 'max_iterations':1000,
 								 'abort_early':False, 'initial_const':1e-3,
@@ -32,7 +32,7 @@ ATTACK_DICT = {
 								 'y_target': None,
 								 'max_iterations': 10,
 								 'learning_rate': 0.1,
-								 'batch_size': 100,
+								 'batch_size': 10, # divisible by the total number of examples
 								 'initial_const': 10}
 	}
 }

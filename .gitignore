@@ -3,3 +3,6 @@
 *.tar
 /save_weights*
 **/.DS_Store
+*.ipynb
+/dataset
+*.txt

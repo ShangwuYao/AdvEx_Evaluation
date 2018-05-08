@@ -8,6 +8,7 @@ from keras.layers import GlobalAveragePooling2D, Dropout, Dense
 from keras.applications.vgg16 import VGG16,preprocess_input,decode_predictions
 from keras.models import Model
 from keras.optimizers import Adam
+import re
 
 
 
@@ -22,7 +23,7 @@ def make_vgg16(lr, class_num, use_pretrained=False):
     x = GlobalAveragePooling2D()(x)
 
     x = Dropout(0.2, seed=6060)(x)
-    predictions = Dense(class_num, kernel_initializer='he_normal')(x)
+    predictions = Dense(class_num, activation='softmax', kernel_initializer='he_normal')(x)
     
     model = Model(input=vgg.input, output=predictions)
     
@@ -85,16 +86,16 @@ def get_imagenet(data_dir="dataset/tiny-imagenet-200/train/"):
     label = 0
     for object_name in object_classes:
         cur_dir=data_dir+object_name+'/images/'
-        images=[image for image in os.listdir(cur_dir)]
+        images=[image for image in os.listdir(cur_dir) if not image.startswith(".")]
+        object_images = []
         for image in images:
-            object_images = []
             im=Image.open(cur_dir+image)
             pix = np.array(im)
 
             if len(pix.shape) < 3:
                 # grayscale image to RGB (3 dimension)
                 pix = cv2.cvtColor(pix, cv2.COLOR_GRAY2BGR) 
-            image_reshaped = cv2.resize(pix, (300, 244), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
+            image_reshaped = cv2.resize(pix, (224, 224), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
             object_images.append(image_reshaped)
             labels.append(label)
 
@@ -104,7 +105,7 @@ def get_imagenet(data_dir="dataset/tiny-imagenet-200/train/"):
             running_sum_y += 1 / count * (pix.shape[1] - running_sum_y)
             
         
-        object_images = np.concatenate([object_[np.newaxis,:,:,:] for object_ in object_images])    
+        object_images = np.array(object_images)
         image_collections.append(object_images)
         label += 1
 
@@ -112,8 +113,69 @@ def get_imagenet(data_dir="dataset/tiny-imagenet-200/train/"):
         
     X = np.concatenate(image_collections)    
     Y = np.array(labels)
+    onehot = np.zeros((Y.shape[0], 200)) # 200 classes
+    onehot[np.arange(Y.shape[0]), Y] = 1
+    print(X.shape, onehot.shape)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=8080) # shuffle is default
+    X_train, X_test, y_train, y_test = train_test_split(X, onehot, test_size=0.20, random_state=8080) # shuffle is default
+
+    return X_train, X_test, y_train, y_test
+
+
+def get_imagenet_val(data_dir="./dataset/tiny-imagenet-200/val/", anno='val_annotations.txt'):
+    image_list = []
+    image_collections = []
+    running_sum_x = 0
+    running_sum_y = 0
+    count = 0
+    labels = []
+    
+    object_images = []
+
+    # get labels from annotation
+    label_dict = {}
+    stringlabel2num = {}
+    with open(data_dir + anno, 'r') as f:
+        data = f.readlines()
+        i = 0
+
+        for line in data:
+            words = line.split()
+            if words[1] not in stringlabel2num:
+                stringlabel2num[words[1]] = i
+                i += 1
+            label_dict[words[0]] = stringlabel2num[words[1]]
+
+    for filename in glob.glob(data_dir + 'images/' + '*.JPEG'): 
+        im=Image.open(filename)
+
+        pix = np.array(im)
+        if len(pix.shape) < 3:
+            # grayscale image to RGB (3 dimension)
+            pix = cv2.cvtColor(pix, cv2.COLOR_GRAY2BGR) 
+        image_reshaped = cv2.resize(pix, (256, 256), interpolation = cv2.INTER_CUBIC) # reshape based on average shape
+        object_images.append(image_reshaped)
+
+        imagename = re.findall('\/(val_.*\.JPEG)', filename)[0]
+        label = label_dict[imagename]
+        labels.append(label)
+
+        # get the running sum for uniform shape
+        count += 1
+        running_sum_x += 1 / count * (pix.shape[0] - running_sum_x)
+        running_sum_y += 1 / count * (pix.shape[1] - running_sum_y)
+    
+    object_images = np.concatenate([object_[np.newaxis,:,:,:] for object_ in object_images])    
+    image_collections.append(object_images)
+
+    print(running_sum_y, running_sum_x) # get the average shape
+        
+    X = np.concatenate(image_collections)    
+    Y = np.array(labels)
+    onehot = np.zeros((Y.shape[0], 200)) # 200 classes
+    onehot[np.arange(Y.shape[0]), Y] = 1
+
+    X_train, X_test, y_train, y_test = train_test_split(X, onehot, test_size=0.20, random_state=8080) # shuffle is default
 
     return X_train, X_test, y_train, y_test
 
