@@ -1,5 +1,5 @@
 /docs
 *.pyc
 *.tar
-/save_weights
+/save_weights*
 **/.DS_Store

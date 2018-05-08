@@ -35,7 +35,7 @@ FLAGS = flags.FLAGS
 
 def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
                    test_end=10000, nb_epochs=6, batch_size=128,
-                   learning_rate=0.001, train_dir="./saved_weights",
+                   learning_rate=0.001, train_dir="./save_weights_caltech101",
                    filename="caltech101.ckpt", load_model=False,
                    testing=False, use_pretrained=False):
     """
@@ -124,27 +124,21 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     #ckpt_path = False if ckpt is None else ckpt.model_checkpoint_path
 
     # load and save
-    save_path = './save_weights/'
-    model_path = save_path + 'mnist-model'
-    saver = tf.train.Saver(tf.trainable_variables())
-
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    ckpt = tf.train.get_checkpoint_state(train_dir)
+    ckpt_path = False if ckpt is None else ckpt.model_checkpoint_path
 
     rng = np.random.RandomState([2017, 8, 30])
-    if load_model and os.path.exists(model_path + '.meta'):
+    if load_model and ckpt_path:
+        print("------loading model------")
         saver = tf.train.Saver()
-        saver.restore(sess, model_path)
-        print("Model loaded from: {}".format(model_path))
+        saver.restore(sess, ckpt_path)
+        print("Model loaded from: {}".format(ckpt_path))
+        print("------evaluating------")
         evaluate()
     else:
-        print("Model was not loaded, training from scratch.")
-        print("------y", y)
-        print("------preds", preds)
-        print("------Y_train", Y_train)
+        print("------Model was not loaded, training from scratch.------")
         model_train(sess, x, y, preds, X_train, Y_train, evaluate=evaluate,
                     args=train_params, save=True, rng=rng)
-        saver.save(sess, model_path)
 
     # Calculate training error
     if testing:
@@ -168,7 +162,7 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     attackmethod = ATTACK_DICT[method_string]['attackmethod'](wrap, back='tf', sess=sess)
     attack_params = ATTACK_DICT[method_string]['attack_params']
 
-    adv_x = attackmethod.generate(x, **attack_params)
+    adv_x = attackmethod.generate_np(x, **attack_params)
     # Consider the attack to be constant
     adv_x = tf.stop_gradient(adv_x)
     #preds_adv = model(adv_x)
@@ -201,7 +195,7 @@ def mnist_tutorial(train_start=0, train_end=60000, test_start=0,
     #preds_2_adv = K.softmax(model_2(fgsm2.generate(x, **fgsm_params)))
 
     attackmethod2 = ATTACK_DICT[method_string]['attackmethod'](wrap_2, back='tf', sess=sess)
-    preds_2_adv = K.softmax(model_2(attackmethod2.generate(x, **attack_params)))
+    preds_2_adv = K.softmax(model_2(attackmethod2.generate_np(x, **attack_params)))
     
 
     def evaluate_2():
@@ -250,7 +244,7 @@ if __name__ == '__main__':
     flags.DEFINE_integer('nb_epochs', 15, 'Number of epochs to train model')
     flags.DEFINE_integer('batch_size', 32, 'Size of training batches')
     flags.DEFINE_float('learning_rate', 0.001, 'Learning rate for training')
-    flags.DEFINE_string('train_dir', './saved_weights', 'Directory where to save model.')
+    flags.DEFINE_string('train_dir', './save_weights_caltech101', 'Directory where to save model.')
     flags.DEFINE_string('filename', 'caltech101.ckpt', 'Checkpoint filename.')
     flags.DEFINE_boolean('load_model', True, 'Load saved model or train.')
     flags.DEFINE_boolean('use_pretrained', False, 'Use pretrained model from imagenet or not.')
