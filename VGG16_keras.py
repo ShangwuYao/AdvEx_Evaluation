@@ -11,7 +11,7 @@ from cleverhans.attacks import CarliniWagnerL2
 from keras.preprocessing.image import load_img,img_to_array
 from keras.applications.vgg16 import VGG16,preprocess_input,decode_predictions
 
-
+##Make Test Changes
 path='./dataset/tiny-imagenet-200/train/n01443537/images'
 CLASS_INDEX=json.load(open('./imagenet_class_index.json'))
 def vgg16_evaluate():
