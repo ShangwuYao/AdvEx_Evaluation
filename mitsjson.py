@@ -1,14 +1,6 @@
 import json
 
 """
-Made a dictionary of 3 lists for each of the sections we had decided to have :
- 1. Feedback
- 2. attack_results
- 3. Optional Feedback
-
- The 2nd list has 5 dictionaries- 1 for each of the attack_methods
-
-
  Robustness Score calculated by taking an average of the accuracy degrade for each of the attack_methods. 
  Lesser the score, higher the robustness of the user's model.
  Scale for Robustness Score (RS) is:
