@@ -1,6 +1,7 @@
 import json
 
 """
+ 
  Robustness Score calculated by taking an average of the accuracy degrade for each of the attack_methods. 
  Lesser the score, higher the robustness of the user's model.
  Scale for Robustness Score (RS) is:
