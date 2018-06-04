@@ -50,7 +50,6 @@ data['details']['attack_results'].append({
 data['graph_link'] = 'https://www.smartdraw.com/bar-graph/'
 data['suggestion'] = 'Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard.'  
 
-
 #data['detailed attack_results']
 with open('data.txt', 'w') as outfile:  
     j=json.dumps(data, indent=4)
