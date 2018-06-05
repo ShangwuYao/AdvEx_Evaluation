@@ -31,7 +31,7 @@
             }
         ]
     },
-    
+  
     "graph_link": "https://www.smartdraw.com/bar-graph/",
     "suggestion": "Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard."
 }
