@@ -31,22 +31,28 @@ After a thorough literature review of the attack methods of the [Cleverhans libr
   - CarliniWagnerL2
   - MadryEtAl 
 
-A brief decription of each of the attack methods and a link to their published paper has been given below.
+A brief decription of each of the attack methods and a link to their published papers have been given below.
+
 ##### FastGradientMethod
 Link: https://arxiv.org/pdf/1412.6572.pdf
 This is the basic algorithm for generating adversarial examples. It is also called the FastGradientSignMethod.
+
 ##### BasicIterativeMethod
 Link: https://arxiv.org/pdf/1607.02533.pdf
 It is an extension of the FastGradientMethod in the sense that it is applied multiple times with small step size, and pixel values of intermediate results are clipped after each step to ensure that they are in an ε-neighbourhood of the original image.
+
 ##### CarliniWagnerL2
 Link: https://arxiv.org/abs/1608.04644
-It is an iterative attack that finds adversarial examples on many defenses that are robust to other attacks. 
+It is an iterative attack that finds adversarial examples on many defenses that are robust to other attacks.
+
 ##### MomentumIterativeMethod
 Link: https://arxiv.org/pdf/1710.06081.pdf
 By integrating the momentum term into the iterative process for attacks, this attack method can stabilize update directions and escape from poor local maxima during the iterations, resulting in more transferable adversarial examples.
+
 ##### MadryEtAl 
 Link: https://arxiv.org/pdf/1706.06083.pdf
 This performs the Projected Gradient Descent Algorithm to attack the model.
 
- A description of the parameters of each of these attack methods can be found [here](http://cleverhans.readthedocs.io/en/latest/source/attacks.html).
+
+A description of the parameters of each of these attack methods can be found [here](http://cleverhans.readthedocs.io/en/latest/source/attacks.html).
 
