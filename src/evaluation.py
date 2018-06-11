@@ -12,6 +12,7 @@ import json
 import pickle
 import os
 import scipy.io as sio
+import argparse
 from keras.models import load_model
 from keras.layers import Input
 from keras import backend
@@ -21,6 +22,15 @@ from keras.preprocessing.image import load_img,img_to_array
 from keras.applications.vgg16 import VGG16,preprocess_input
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--model",help="model path")
+parser.add_argument("--index",help="index path")
+
+
+
+args = parser.parse_args()
+
+
 
 '''
 The class takes model's path and its json file's path as input
@@ -28,12 +38,12 @@ The class takes model's path and its json file's path as input
 class Model_Evaluator(object):
     def __init__(self,model_path,json_path):
         super(Model_Evaluator,self).__init__()
-        adv_path='./adv_set.pkl'
-        clean_path='./clean_set.pkl'
+        set_path=['CLEAN','FGSM','Mi-FGSM','I-FGSM','MADRY','CW']
+        
         
         ##These methods to change when integrated
-        self.adv_set=pickle.load(open(adv_path))
-        self.clean_set=pickle.load(open(clean_path))
+        self.input_set=load_set(set_path,'./evaluate_input_')
+        self.label_set=load_set(set_path,'./evaluate_label_')
         
         #self.model=load_model(model_path)
         
@@ -45,6 +55,11 @@ class Model_Evaluator(object):
         
         self.class_index=json.load(open(json_path))
         
+    #Private functions that only be called by init
+    def load_set(self,sets,path):
+        for set_ in sets:
+            
+            
     
     #Private functions that only will be called by evaluate
     def decode_predictions(self,predict):
@@ -83,7 +98,7 @@ class Model_Evaluator(object):
                 
 
 
-model=Model_Evaluator('.','./imagenet_class_index.json')
+model=Model_Evaluator(args.model,args.index)
 model.evaluate()
         
     
