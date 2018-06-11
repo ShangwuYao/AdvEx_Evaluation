@@ -17,7 +17,6 @@ from keras.models import load_model
 from keras.layers import Input
 from keras import backend
 from keras import utils
-from cleverhans.attacks import FastGradientMethod
 from keras.preprocessing.image import load_img,img_to_array
 from keras.applications.vgg16 import VGG16,preprocess_input
 
@@ -38,12 +37,11 @@ The class takes model's path and its json file's path as input
 class Model_Evaluator(object):
     def __init__(self,model_path,json_path):
         super(Model_Evaluator,self).__init__()
-        set_path=['CLEAN','FGSM','Mi-FGSM','I-FGSM','MADRY','CW']
+        self.set_path=['CLEAN','FGSM','Mi-FGSM','I-FGSM','MADRY','CW']
         
         
         ##These methods to change when integrated
-        self.input_set=load_set(set_path,'./evaluate_input_')
-        self.label_set=load_set(set_path,'./evaluate_label_')
+#        self.input_set=load_set(set_path,'./evaluate_input_')
         
         #self.model=load_model(model_path)
         
@@ -56,8 +54,15 @@ class Model_Evaluator(object):
         self.class_index=json.load(open(json_path))
         
     #Private functions that only be called by init
-    def load_set(self,sets,path):
-        for set_ in sets:
+    def load_set(self,set_):
+        my_dict={}
+        inputs=np.load(open('./evaluate_input_'+set_+'.npy'))
+        labels=np.load(open('./evaluate_label_'+set_+'.npy'))
+        for key,input_ in zip(labels,inputs):
+            if key not in my_dict:
+                my_dict[key]=[]
+            my_dict[key].append(input_)
+        return my_dict
             
             
     
@@ -88,11 +93,14 @@ class Model_Evaluator(object):
             return float(right)/total
             #print clean_predict.shape
         
-        clean=calculate_acc(self.clean_set)
-        print("Clean ACC: ",clean)
         
-        adv=calculate_acc(self.adv_set)
-        print("ADV ACC: ",adv)        
+        for path in self.set_path:
+            inputs=self.load_set(path)
+            acc=calculate_acc(inputs)
+            print(path+" ACC: ",acc)
+#        
+#        adv=calculate_acc(self.adv_set)
+#        print("ADV ACC: ",adv)        
         
             
                 
