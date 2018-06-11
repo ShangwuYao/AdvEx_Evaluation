@@ -57,7 +57,7 @@ def output_file(my_dict,description):
     np.save(open('evaluate_input_'+description+'.npy','wb'),arr)
     np.save(open('evaluate_label_'+description+'.npy','wb'),lbl)   
 
-def binary_search_epsilon(model,attack,labels,output_clean,binary_iter=1,attack_params=None,description=None):
+def binary_search_epsilon(model,attack,labels,output_clean,binary_iter=1,attack_params=None,description=None,num_generate=1):
 
     print('Currently attack: ',description)
     ##Currently, we are planning to only take 10 images per class to generate AE
@@ -87,7 +87,7 @@ def binary_search_epsilon(model,attack,labels,output_clean,binary_iter=1,attack_
         if output_clean:
             my_dict[class_lbl].append(np.uint8(input_))
             num+=1
-            if num>=5:
+            if num>=num_generate:
                 output_file(my_dict,description)
                 break
             continue
@@ -120,7 +120,7 @@ def binary_search_epsilon(model,attack,labels,output_clean,binary_iter=1,attack_
         num+=1
         
         print('Number of AE created: ',num)
-        if num>=1:
+        if num>=num_generate:
             break
     
     output_file(my_dict,description)
@@ -147,7 +147,7 @@ def main():
     
     #Search for the best epsilon to use
     for key in attacks:
-        binary_search_epsilon(model,attacks[key],labels,key=='CLEAN',description=key)
+        binary_search_epsilon(model,attacks[key],labels,key=='CLEAN',binary_iter=1,description=key,num_generate=1)
 
 main()
     
