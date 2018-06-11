@@ -10,6 +10,6 @@ The `preprocess_adversarial_images.py` script set up a white-box attack schema a
 
 
 ```bash
-python evaluate.py --model your_model --label your_label
+python evaluate.py --model your_model --index your_index
 ```
 To run the `evaluate` script, you will have to provide your_model that is saved by keras's save function `model.save` and a JSON file that contains a mapping between index to label. More detailed informaiton can be found here. [(Help)](http://google.com)
