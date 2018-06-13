@@ -7,6 +7,7 @@ Created on Thu May 31 15:24:55 2018
 """
 from PIL import Image
 import numpy as np
+import time
 import tensorflow as tf
 import keras
 import json
@@ -84,6 +85,11 @@ def binary_search_epsilon(model,attack,labels,output_clean,binary_iter=1,attack_
         #input_=input_.reshape(1,input_.shape[0],input_.shape[1],input_.shape[2])
         predict=decode_predictions(model.predict(input_))[0][0]
         
+        if predict[0]!=class_lbl:
+            print('Wrong label. Proceed')
+            continue
+
+
         if output_clean:
             my_dict[class_lbl].append(np.uint8(input_))
             num+=1
@@ -91,12 +97,6 @@ def binary_search_epsilon(model,attack,labels,output_clean,binary_iter=1,attack_
                 output_file(my_dict,description)
                 break
             continue
-
-
-        if predict[0]!=class_lbl:
-            print('Wrong label. Proceed')
-            continue
-
         
         result=None
         while iters < binary_iter:
@@ -137,17 +137,20 @@ def main():
               metrics=['accuracy'])
     
     attack_fgsm=FastGradientMethod(model, sess=sess)
-    attack_cw=CarliniWagnerL2(model,sess=sess)
+    #attack_cw=CarliniWagnerL2(model,sess=sess)
     attack_iterative=BasicIterativeMethod(model,sess=sess)
     attack_momentum=MomentumIterativeMethod(model,sess=sess)
-    attack_madry=MadryEtAl(model,sess=sess)
-    attacks={'CLEAN':None,'FGSM':attack_fgsm,'CW':attack_cw,'I-FGSM':attack_iterative,'Mi-FGSM':attack_momentum,'MADRY':attack_madry}
+    #attack_madry=MadryEtAl(model,sess=sess)
+    attacks={'CLEAN':None,'FGSM':attack_fgsm,'I-FGSM':attack_iterative,'Mi-FGSM':attack_momentum}
     #Load the ground truth label of the images
     labels=load_label('ILSVRC2012_validation_ground_truth.txt')
     
     #Search for the best epsilon to use
     for key in attacks:
-        binary_search_epsilon(model,attacks[key],labels,key=='CLEAN',binary_iter=1,description=key,num_generate=1)
+        start=time.time()
+        binary_search_epsilon(model,attacks[key],labels,key=='CLEAN',binary_iter=5,description=key,num_generate=1)
+        end=time.time()
+        print("Total time: ",end-start)
 
 main()
     

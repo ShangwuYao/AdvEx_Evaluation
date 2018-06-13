@@ -6,6 +6,7 @@ Created on Sat Jun  2 12:09:17 2018
 @author: mancx111
 """
 import numpy as np
+import time
 import tensorflow as tf
 import keras
 import json
@@ -37,7 +38,7 @@ The class takes model's path and its json file's path as input
 class Model_Evaluator(object):
     def __init__(self,model_path,json_path):
         super(Model_Evaluator,self).__init__()
-        self.set_path=['CLEAN','FGSM','Mi-FGSM','I-FGSM','MADRY','CW']
+        self.set_path=['CLEAN','FGSM','Mi-FGSM','I-FGSM','MADRY']
         
         
         ##These methods to change when integrated
@@ -52,7 +53,7 @@ class Model_Evaluator(object):
               metrics=['accuracy'])
         
         self.class_index=json.load(open(json_path))
-        
+        self.class_set=set([self.class_index[x][0] for x in self.class_index])  ##need change after deployment
     #Private functions that only be called by init
     def load_set(self,set_):
         my_dict={}
@@ -72,7 +73,7 @@ class Model_Evaluator(object):
         
         decode=[]
         for label in argmax:
-            decode.append(self.class_index[str(label)][0])
+            decode.append(self.class_index[str(label)][0]) #need change after deployment
         return np.array(decode)
         
     def evaluate(self):
@@ -82,7 +83,7 @@ class Model_Evaluator(object):
         def calculate_acc(data):
             right,total=0,0
             for key in data:
-                if len(data[key]) ==0:
+                if len(data[key]) ==0 or key not in self.class_set:
                     continue
                 y=key
     
@@ -95,9 +96,12 @@ class Model_Evaluator(object):
         
         
         for path in self.set_path:
+            start=time.time()
             inputs=self.load_set(path)
             acc=calculate_acc(inputs)
+            end=time.time()
             print(path+" ACC: ",acc)
+            print(path+" TIME: ",end-start)
 #        
 #        adv=calculate_acc(self.adv_set)
 #        print("ADV ACC: ",adv)        
