@@ -65,13 +65,13 @@ def evaluate_job(job):
     index_file = job['s3_index_key']
     
     #Check 1: File extension
-    if !model_file.endswith('.h5'):
-        if !index_file.endswith('.json'):
+    if not model_file.endswith('.h5'):
+        if not index_file.endswith('.json'):
             feedback = {"error": "Model file has to have .h5 as its extension. Index file has to have .json as its extension"}
         else:
             feedback = {"error": "Model file has to have .h5 as its extension."}
     else:
-        if !index_file.endswith('.json'):
+        if not index_file.endswith('.json'):
             feedback = {"error": "Index file has to have .json as its extension"}       
             
     bucket.download_file(model_file, 'tmp/'+model_file)
