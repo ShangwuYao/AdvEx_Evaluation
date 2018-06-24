@@ -9,7 +9,7 @@ import numpy as np
 import time
 import json
 import argparse
-from keras.applications.vgg16 import VGG16
+from keras.models import load_model
 
 
 parser = argparse.ArgumentParser()
@@ -36,11 +36,8 @@ class Model_Evaluator(object):
         
         #self.model=load_model(model_path)
         
-        #Just for alpha testing
-        self.model=VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000)
-        self.model.compile(loss='categorical_crossentropy',
-              optimizer='sgd',
-              metrics=['accuracy'])
+        #Just for alpha testing,need change after deployment
+        self.models=['vgg19.h5']#,'vgg19.h5']
         
         self.class_index=json.load(open(json_path))
         self.class_set=set([self.class_index[x][0] for x in self.class_index])  ##need change after deployment
@@ -61,7 +58,6 @@ class Model_Evaluator(object):
     def decode_predictions(self,predict):
         argmax=np.argmax(predict,axis=1)
         confidence=np.max(predict,axis=1).sum()
-        
         decode=[]
         for label in argmax:
             decode.append(self.class_index[str(label)][0]) #need change after deployment
@@ -71,39 +67,62 @@ class Model_Evaluator(object):
         '''
         The output of this model should be accuracy
         '''
-        def calculate_acc(data):
-            right,total=0,0
+        def calculate_acc(data,model):
+            '''
+            data is a dictionary where y is the key and X are the value
+            '''
+            right,total,confidence=0,0,0.0
             for key in data:
                 if len(data[key]) ==0 or key not in self.class_set:
                     continue
                 y=key
     
-                batch=np.vstack(data[y])
-                predict,confidence=self.decode_predictions(self.model.predict(batch,batch_size=10))
+                batch=np.vstack(data[y])-127.5
+                predict,con=self.decode_predictions(model.predict(batch,batch_size=10))
                 right+=len(predict[predict==y])
                 total+=len(data[y])
-            return float(right)/total,confidence/total
+                confidence+=con
+            return float(right*100)/total,confidence*100/total
             #print clean_predict.shape
         
         
-        for path in self.set_path:
-            start=time.time()
-            inputs=self.load_set(path)
-            acc,confidence=calculate_acc(inputs)
-            end=time.time()
-            print(path+" ACC: ",acc)
-            print(path+" Average Confidence: ",confidence)
-            print(path+" TIME: ",end-start)
-#        
-#        adv=calculate_acc(self.adv_set)
-#        print("ADV ACC: ",adv)        
+        
+        result=None
+        #The deployment should only have one model in self.models
+        for model_path in self.models:
+            degrade,score_list=0.0,[]
+            result={'robustness':None,'rating':None,'details':[],'graph_link':None,'suggestion':None}
+            for path in self.set_path:
+                inputs=self.load_set(path)
+                score={}
+                acc,confidence=calculate_acc(inputs,load_model(model_path)) ##Need change after deployment
+                score['attack_method']=path
+                score['accuracy']=str(acc)+'%'
+                score['confidence']=str(confidence)+'%'
+                result['details'].append(score)
+                score_list.append(acc)
+                
+                if len(score_list)>1:
+                    degrade+=score_list[-1]
+            result['robustness']=str(100*(score_list[0]-degrade/(len(score_list)-1))/score_list[0])
+            print result
+      
+        return result
         
             
                 
 ###Your work
 ##specify what is the input here
-model=Model_Evaluator(args.model,args.index)
-model.evaluate()
+
+result={}
+try:
+    model=Model_Evaluator(args.model,args.index)
+    result=model.evaluate()
+except Exception as exc:
+    result['message']=exc.__str__()
+
+output=json.dumps(result)
+    
 
 ##What is the output of the evaluate
         
