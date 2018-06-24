@@ -1,37 +1,28 @@
 {
-    "robustness": "9",
-    "rating": "Good",
-    "details": {
-        "original_accuracy": "98.55%",
-        "attack_results": [
-            {
-                "attack_method": "FGSM",
-                "accuracy": "80.05%",
-                "confidence": "95%"
-            },
-            {
-                "attack_method": "Basic Iterative Method",
-                "accuracy": "92.10%",
-                "confidence": "91%"
-            },
-            {
-                "attack_method": "Carlini Wagner",
-                "accuracy": "94.10%",
-                "confidence": "93%"
-            },
-            {
-                "attack_method": "Momentum Iterative Method",
-                "accuracy": "94.10%",
-                "confidence": "93.7%"
-            },
-            {
-                "attack_method": "DeepFool",
-                "accuracy": "90.10%",
-                "confidence": "89%"
-            }
-        ]
-    },
- 
-    "graph_link": "https://www.smartdraw.com/bar-graph/",
-    "suggestion": "Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard."
+    "rating": "Good", 
+    "robustness": "9", 
+    "details": [
+        {
+            "attack_method": "CLEAN", 
+            "confidence": "95%", 
+            "accuracy": "80.05%"
+        }, 
+        {
+            "attack_method": "FGSM", 
+            "confidence": "95%", 
+            "accuracy": "80.05%"
+        }, 
+        {
+            "attack_method": "MI-FGSM", 
+            "confidence": "91%", 
+            "accuracy": "92.10%"
+        }, 
+        {
+            "attack_method": "I-FGSM", 
+            "confidence": "93.7%", 
+            "accuracy": "94.10%"
+        }
+    ], 
+    "suggestion": "Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard.", 
+    "graph_link": "https://www.smartdraw.com/bar-graph/"
 }

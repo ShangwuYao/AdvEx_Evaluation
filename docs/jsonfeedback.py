@@ -15,35 +15,29 @@ import json
 data = {}  
 data['robustness'] = '9'
 data['rating']= 'Good'
-data['details'] = {}
-data['details']['original_accuracy'] = '98.55%'
-data['details']['attack_results']=[]
+data['details'] = []
 
-data['details']['attack_results'].append({  
+data['details'].append({  
+    'attack_method': 'CLEAN',
+    'accuracy': '80.05%',
+    'confidence': '95%'
+})
+data['details'].append({  
     'attack_method': 'FGSM',
     'accuracy': '80.05%',
     'confidence': '95%'
 })
-data['details']['attack_results'].append({  
-    'attack_method': 'Basic Iterative Method',
+data['details'].append({  
+    'attack_method': 'MI-FGSM',
     'accuracy': '92.10%',
     'confidence': '91%'
 })
-data['details']['attack_results'].append({  
-    'attack_method': 'Carlini Wagner',
-    'accuracy': '94.10%',
-    'confidence': '93%'
-})
 
-data['details']['attack_results'].append({  
-    'attack_method': 'Momentum Iterative Method',
+
+data['details'].append({  
+    'attack_method': 'I-FGSM',
     'accuracy': '94.10%',
     'confidence': '93.7%'
-})
-data['details']['attack_results'].append({  
-    'attack_method': 'DeepFool',
-    'accuracy': '90.10%',
-    'confidence': '89%'
 })
 
 data['graph_link'] = 'https://www.smartdraw.com/bar-graph/'
