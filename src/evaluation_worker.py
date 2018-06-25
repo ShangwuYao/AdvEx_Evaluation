@@ -77,15 +77,17 @@ def evaluate_job(job):
     bucket.download_file(model_file, model_file)
     bucket.download_file(index_file, index_file)
     
+    model_size=bucket.lookup(model_file)
+    index_size=bucket.lookup(index_file)
     #Check 2: File Size Check
     if not feedback:
-        if model_file.size > 1073741824: # 1 GiB
-            if index_file.size > 10240:
+        if model_size.size > 1073741824: # 1 GiB
+            if index_size.size > 10240:
                 feedback = {"error": ".h5 file can't be bigger than 1GB and .json file can't be bigger than 10KB."}
             else:
                 feedback = {"error": ".h5 file can't be bigger than 1GB."}
         else:
-            if index_file.size > 10240:
+            if index_size.size > 10240:
                 feedback = {"error": ".json file can't be bigger than 10KB."}
     
     if not feedback:
