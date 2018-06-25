@@ -32,7 +32,7 @@ class Model_Evaluator(object):
         
         
         #Just for alpha testing,need change after deployment
-        self.models=['vgg19.h5']#,'vgg19.h5']
+        self.models=[model_path]
         
         self.class_index=json.load(open(json_path))
         self.class_set=set([self.class_index[x][0] for x in self.class_index])  ##need change after deployment
