@@ -90,7 +90,8 @@ def evaluate_job(job):
     
     if not feedback:
         #The model file and index file are perfectly fine.
-        feedback=Model_Evaluator(model_file, index_file)
+        model = Model_Evaluator(model_file, index_file)
+	feedback = model.evaluate()
         #Check 3: DDOS
         time.sleep(2000)
         
