@@ -12,13 +12,13 @@ import argparse
 from keras.models import load_model
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--model",help="model path",default='.')
-parser.add_argument("--index",help="index path",default='./imagenet_class_index.json')
-
-
-
-args = parser.parse_args()
+#parser = argparse.ArgumentParser()
+#parser.add_argument("--model",help="model path",default='.')
+#parser.add_argument("--index",help="index path",default='./imagenet_class_index.json')
+#
+#
+#
+#args = parser.parse_args()
 
 
 
@@ -31,11 +31,6 @@ class Model_Evaluator(object):
         self.set_path=['CLEAN','FGSM','Mi-FGSM','I-FGSM']
         
         
-        ##These methods to change when integrated
-#        self.input_set=load_set(set_path,'./evaluate_input_')
-        
-        #self.model=load_model(model_path)
-        
         #Just for alpha testing,need change after deployment
         self.models=['vgg19.h5']#,'vgg19.h5']
         
@@ -44,8 +39,8 @@ class Model_Evaluator(object):
     #Private functions that only be called by init
     def load_set(self,set_):
         my_dict={}
-        inputs=np.load(open('./image_data/evaluate_input_'+set_+'.npy'))
-        labels=np.load(open('./image_data/evaluate_label_'+set_+'.npy'))
+        inputs=np.load(open('./image_data_v2/evaluate_input_'+set_+'.npy'))
+        labels=np.load(open('./image_data_v2/evaluate_label_'+set_+'.npy'))
         for key,input_ in zip(labels,inputs):
             if key not in my_dict:
                 my_dict[key]=[]
@@ -96,7 +91,7 @@ class Model_Evaluator(object):
                 inputs=self.load_set(path)
                 score={}
                 acc,confidence=calculate_acc(inputs,load_model(model_path)) ##Need change after deployment
-                score['attack_method']=path
+                score['attack_method']=path.upper()
                 score['accuracy']=str(acc)+'%'
                 score['confidence']=str(confidence)+'%'
                 result['details'].append(score)
@@ -105,7 +100,6 @@ class Model_Evaluator(object):
                 if len(score_list)>1:
                     degrade+=score_list[-1]
             result['robustness']=str(100*(score_list[0]-degrade/(len(score_list)-1))/score_list[0])
-            print result
       
         return result
         
@@ -114,14 +108,14 @@ class Model_Evaluator(object):
 ###Your work
 ##specify what is the input here
 
-result={}
-try:
-    model=Model_Evaluator(args.model,args.index)
-    result=model.evaluate()
-except Exception as exc:
-    result['message']=exc.__str__()
-
-output=json.dumps(result)
+#result={}
+#try:
+#    model=Model_Evaluator(args.model,args.index)
+#    result=model.evaluate()
+#except Exception as exc:
+#    result['message']=exc.__str__()
+#
+#output=json.dumps(result)
     
 
 ##What is the output of the evaluate
