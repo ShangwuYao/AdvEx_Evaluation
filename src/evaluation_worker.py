@@ -2,10 +2,13 @@ import boto3
 import json
 import time
 from db import db, Submission
-from evaluate import Model_Evaluator
+from evaluation import Model_Evaluator
 
 
 s3 = boto3.resource('s3')
+s3_client = boto3.client('s3')
+response_model = s3_client.head_object(Bucket='advex', Key='vgg16.h5')
+response_index = s3_client.head_object(Bucket='advex', Key='imagenet_class_index.json')
 bucket = s3.Bucket('advex')
 
 sqs = boto3.client('sqs')
@@ -74,21 +77,21 @@ def evaluate_job(job):
         if not index_file.endswith('.json'):
             feedback = {"error": "Index file has to have .json as its extension"}       
             
-    bucket.download_file(model_file, model_file)
-    bucket.download_file(index_file, index_file)
+    #bucket.download_file(model_file, model_file)
+    #bucket.download_file(index_file, index_file)
     
-    model_size=bucket.lookup(model_file)
-    index_size=bucket.lookup(index_file)
+    model_size=response_model['ContentLength']
+    index_size=response_index['ContentLength']
     #Check 2: File Size Check
     if not feedback:
-        if model_size.size > 1073741824: # 1 GiB
-            if index_size.size > 10240:
-                feedback = {"error": ".h5 file can't be bigger than 1GB and .json file can't be bigger than 10KB."}
+        if model_size > 1073741824: # 1 GiB
+            if index_size > 102400:
+                feedback = {"error": ".h5 file can't be bigger than 1GB and .json file can't be bigger than 100KB."}
             else:
                 feedback = {"error": ".h5 file can't be bigger than 1GB."}
         else:
-            if index_size.size > 10240:
-                feedback = {"error": ".json file can't be bigger than 10KB."}
+            if index_size > 102400:
+                feedback = {"error": ".json file can't be bigger than 100KB."}
     
     if not feedback:
         #The model file and index file are perfectly fine.
@@ -99,11 +102,10 @@ def evaluate_job(job):
             result=model.evaluate()
         except Exception as exc:
             result['message']=exc.__str__()
-        
+        print result
         feedback=json.dumps(result)
         #Check 3: DDOS
-        time.sleep(2000)
-        
+            
     write_feedback(submission_id, feedback)
     
 def main():
