@@ -2,7 +2,7 @@ import boto3
 import json
 import time
 from db import db, Submission
-from evaluate import Model_Evaluator
+from evaluation import Model_Evaluator
 
 
 s3 = boto3.resource('s3')
