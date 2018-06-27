@@ -6,10 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
 
 
-PG_HOST = os.environ['PG_HOST']
-PG_USERNAME = os.environ['PG_USERNAME']
-PG_PASSWORD = os.environ['PG_PASSWORD']
-PG_DATABASE = os.environ['PG_DATABASE']
+PG_HOST = os.environ['POSTGRES_URL']
+PG_USERNAME = os.environ['POSTGRES_USER']
+PG_PASSWORD = os.environ['POSTGRES_PW']
+PG_DATABASE = os.environ['POSTGRES_DB']
 
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{host}/{db}'.format(
 	user=PG_USERNAME, 
