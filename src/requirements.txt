@@ -1,6 +1,6 @@
-Python == 2.7.6
-numpy == 1.14.2
-time
+numpy == 1.14.3
 json == 2.0.9
-argparse == 1.1
-keras == 2.1.6
+keras == 2.2.0
+tensorflow == 1.8.0
+flask == 1.0.2
+flask-sqlalchemy == 2.3.2
