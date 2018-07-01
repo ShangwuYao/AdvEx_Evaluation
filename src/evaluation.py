@@ -7,7 +7,6 @@ Created on Sat Jun  2 12:09:17 2018
 """
 import numpy as np
 import json
-import argparse
 from keras.models import load_model
 
 
