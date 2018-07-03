@@ -58,19 +58,25 @@ except:
 # }
 
 
-def write_feedback(submission_id, feedback):
+def update_feedback(submission_id, feedback=None, status=None):
     print('Writing feedback.')
     submission = Submission.query.get(submission_id)
-    submission.feedback = feedback
+    if feedback is not None:
+        submission.feedback = feedback
+    if status is not None:
+        submission.status = status
     db.session.commit()
 
 
 def evaluate_job(job):
     print('Evaluating model.')
+
     feedback={}
     submission_id = job['submission_id']
     model_file = job['s3_model_key']
     index_file = job['s3_index_key']
+
+    update_feedback(submission_id, status='Running')
     
     #Check 1: File extension
     if not model_file.endswith('.h5'):
@@ -104,17 +110,15 @@ def evaluate_job(job):
     
     if not feedback:
         #The model file and index file are perfectly fine.
-
-        result={}
         try:
             model=Model_Evaluator(model_file,index_file)
-            result=model.evaluate()
+            feedback=model.evaluate()
         except Exception as exc:
-            result['error']=exc.__str__()
-        print(result)
-        # feedback=json.dumps(result)
-            
-    write_feedback(submission_id, feedback)
+            feedback['error']=exc.__str__()
+    
+    print(feedback)
+    status = ('error' in feedback ? 'Failed' : 'Finished')
+    write_feedback(submission_id, feedback=feedback, status=status)
     
 def main():
     while True:
