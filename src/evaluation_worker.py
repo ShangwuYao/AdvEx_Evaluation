@@ -22,47 +22,47 @@ except:
     warnings.warn("sqs not started", UserWarning)
 
 # SAMPLE_FEEDBACK = {
-# 	"robustness": "9",
-# 	"rating": "Good",
-# 	"details": {
-# 		"original_accuracy": "98.55%",
-# 		"attack_results": [
-# 			{
-# 				"attack_method": "FGSM",
-# 				"accuracy": "80.05%",
-# 				"confidence": "95%"
-# 			},
-# 			{
-# 				"attack_method": "Basic Iterative Method",
-# 				"accuracy": "92.10%",
-# 				"confidence": "91%"
-# 			},
-# 			{
-# 				"attack_method": "Carlini Wagner",
-# 				"accuracy": "94.10%",
-# 				"confidence": "93%"
-# 			},
-# 			{
-# 				"attack_method": "Momentum Iterative Method",
-# 				"accuracy": "94.10%",
-# 				"confidence": "93.7%"
-# 			},
-# 			{
-# 				"attack_method": "DeepFool",
-# 				"accuracy": "90.10%",
-# 				"confidence": "89%"
-# 			}
-# 		]
-# 	},
-# 	"suggestion": "Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard."
+#   "robustness": "9",
+#   "rating": "Good",
+#   "details": {
+#       "original_accuracy": "98.55%",
+#       "attack_results": [
+#           {
+#               "attack_method": "FGSM",
+#               "accuracy": "80.05%",
+#               "confidence": "95%"
+#           },
+#           {
+#               "attack_method": "Basic Iterative Method",
+#               "accuracy": "92.10%",
+#               "confidence": "91%"
+#           },
+#           {
+#               "attack_method": "Carlini Wagner",
+#               "accuracy": "94.10%",
+#               "confidence": "93%"
+#           },
+#           {
+#               "attack_method": "Momentum Iterative Method",
+#               "accuracy": "94.10%",
+#               "confidence": "93.7%"
+#           },
+#           {
+#               "attack_method": "DeepFool",
+#               "accuracy": "90.10%",
+#               "confidence": "89%"
+#           }
+#       ]
+#   },
+#   "suggestion": "Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard."
 # }
 
 
 def write_feedback(submission_id, feedback):
-	print('Writing feedback.')
-	submission = Submission.query.get(submission_id)
-	submission.feedback = feedback
-	db.session.commit()
+    print('Writing feedback.')
+    submission = Submission.query.get(submission_id)
+    submission.feedback = feedback
+    db.session.commit()
 
 
 def evaluate_job(job):
@@ -111,34 +111,30 @@ def evaluate_job(job):
             result=model.evaluate()
         except Exception as exc:
             result['error']=exc.__str__()
-        print result
-        feedback=json.dumps(result)
-        #Check 3: DDOS
+        print(result)
+        # feedback=json.dumps(result)
             
     write_feedback(submission_id, feedback)
     
 def main():
-    try:
-    	while True:
-    		resp = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)
-    		if 'Messages' not in resp:
-    			print('No messages received, sleep for 10s.')
-    			time.sleep(10)
-    			continue
+    while True:
+        resp = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)
+        if 'Messages' not in resp:
+            print('No messages received, sleep for 10s.')
+            time.sleep(10)
+            continue
 
-    		print('Message received.')
-    		message = resp['Messages'][0]
-    		receipt_handle = message['ReceiptHandle']
-    		job = json.loads(message['Body'])
+        print('Message received.')
+        message = resp['Messages'][0]
+        receipt_handle = message['ReceiptHandle']
+        job = json.loads(message['Body'])
 
-    		# Process job
-    		evaluate_job(job)
+        # Process job
+        evaluate_job(job)
 
-    		# Delete message
-    		resp = sqs.delete_message(QueueUrl=queue_url,ReceiptHandle=receipt_handle)
-    except:
-        print("failed to start worker")
+        # Delete message
+        resp = sqs.delete_message(QueueUrl=queue_url,ReceiptHandle=receipt_handle)
 
 
 if __name__ == '__main__':
-	main()
+    main()
