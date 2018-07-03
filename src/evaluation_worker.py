@@ -117,9 +117,10 @@ def evaluate_job(job):
             feedback['error']=exc.__str__()
     
     print(feedback)
-    status = ('error' in feedback ? 'Failed' : 'Finished')
-    write_feedback(submission_id, feedback=feedback, status=status)
-    
+    status = ('Failed' if 'error' in feedback else 'Finished')
+    update_feedback(submission_id, feedback=feedback, status=status)
+
+
 def main():
     while True:
         resp = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)
