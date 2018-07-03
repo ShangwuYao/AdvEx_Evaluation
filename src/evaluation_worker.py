@@ -1,20 +1,27 @@
 import boto3
 import json
 import time
+import os, sys
+import warnings
+#print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from db import db, Submission
 from evaluation import Model_Evaluator
 
 
-s3 = boto3.resource('s3')
-s3_client = boto3.client('s3')
-response_model = s3_client.head_object(Bucket='advex', Key='vgg16.h5')
-response_index = s3_client.head_object(Bucket='advex', Key='imagenet_class_index.json')
-bucket = s3.Bucket('advex')
+try:
+    s3 = boto3.resource('s3')
+    s3_client = boto3.client('s3')
+    response_model = s3_client.head_object(Bucket='advex', Key='vgg16.h5')
+    response_index = s3_client.head_object(Bucket='advex', Key='imagenet_class_index.json')
+    bucket = s3.Bucket('advex')
 
-sqs = boto3.client('sqs')
-resp = sqs.get_queue_url(QueueName='advex')
-queue_url = resp['QueueUrl']
-
+    sqs = boto3.client('sqs')
+    resp = sqs.get_queue_url(QueueName='advex')
+    queue_url = resp['QueueUrl']
+except:
+    # should raise error here
+    warnings.warn("sqs not started", UserWarning)
 
 # SAMPLE_FEEDBACK = {
 # 	"robustness": "9",
@@ -109,23 +116,26 @@ def evaluate_job(job):
     write_feedback(submission_id, feedback)
     
 def main():
-	while True:
-		resp = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)
-		if 'Messages' not in resp:
-			print('No messages received, sleep for 10s.')
-			time.sleep(10)
-			continue
+    try:
+    	while True:
+    		resp = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)
+    		if 'Messages' not in resp:
+    			print('No messages received, sleep for 10s.')
+    			time.sleep(10)
+    			continue
 
-		print('Message received.')
-		message = resp['Messages'][0]
-		receipt_handle = message['ReceiptHandle']
-		job = json.loads(message['Body'])
+    		print('Message received.')
+    		message = resp['Messages'][0]
+    		receipt_handle = message['ReceiptHandle']
+    		job = json.loads(message['Body'])
 
-		# Process job
-		evaluate_job(job)
+    		# Process job
+    		evaluate_job(job)
 
-		# Delete message
-		resp = sqs.delete_message(QueueUrl=queue_url,ReceiptHandle=receipt_handle)
+    		# Delete message
+    		resp = sqs.delete_message(QueueUrl=queue_url,ReceiptHandle=receipt_handle)
+    except:
+        print("failed to start worker")
 
 
 if __name__ == '__main__':

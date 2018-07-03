@@ -4,23 +4,12 @@ from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
+from config.testing_local import *
 
-
-PG_HOST = os.environ['POSTGRES_URL']
-PG_USERNAME = os.environ['POSTGRES_USER']
-PG_PASSWORD = os.environ['POSTGRES_PW']
-PG_DATABASE = os.environ['POSTGRES_DB']
-
-DB_URL = 'postgresql+psycopg2://{user}:{pw}@{host}/{db}'.format(
-	user=PG_USERNAME, 
-	pw=PG_PASSWORD,
-	host=PG_HOST,
-	db=PG_DATABASE
-)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS 
 
 db = SQLAlchemy(app)
 db.init_app(app)
