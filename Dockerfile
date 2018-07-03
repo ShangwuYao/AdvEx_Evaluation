@@ -10,6 +10,8 @@ ADD ./config /app/config
 ADD ./__init__.py /app
 ADD ./requirements.txt /app
 ADD ./Dockerfile /app
+ADD ./start.sh /app
+ADD ./production.env /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
@@ -24,8 +26,6 @@ RUN wget https://s3.amazonaws.com/advex/evaluation_data/image_data_final.zip \
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
-CMD ["python", "./src/evaluation_worker.py"]
+# Run script on start
+RUN chmod 755 ./start.sh
+ENTRYPOINT ["./start.sh"]
