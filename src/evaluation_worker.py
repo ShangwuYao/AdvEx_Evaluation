@@ -12,8 +12,6 @@ from evaluation import Model_Evaluator
 try:
     s3 = boto3.resource('s3')
     s3_client = boto3.client('s3')
-    response_model = s3_client.head_object(Bucket='advex', Key='vgg16.h5')
-    response_index = s3_client.head_object(Bucket='advex', Key='imagenet_class_index.json')
     bucket = s3.Bucket('advex')
 
     sqs = boto3.client('sqs')
@@ -83,12 +81,16 @@ def evaluate_job(job):
     else:
         if not index_file.endswith('.json'):
             feedback = {"error": "Index file has to have .json as its extension"}       
-            
-    #bucket.download_file(model_file, model_file)
-    #bucket.download_file(index_file, index_file)
     
+    response_model = s3_client.head_object(Bucket='advex', Key=model_file)
+    response_index = s3_client.head_object(Bucket='advex', Key=index_file)
+
     model_size=response_model['ContentLength']
     index_size=response_index['ContentLength']
+
+    bucket.download_file(model_file, model_file)
+    bucket.download_file(index_file, index_file)
+
     #Check 2: File Size Check
     if not feedback:
         if model_size > 1073741824: # 1 GiB
@@ -108,7 +110,7 @@ def evaluate_job(job):
             model=Model_Evaluator(model_file,index_file)
             result=model.evaluate()
         except Exception as exc:
-            result['message']=exc.__str__()
+            result['error']=exc.__str__()
         print result
         feedback=json.dumps(result)
         #Check 3: DDOS
