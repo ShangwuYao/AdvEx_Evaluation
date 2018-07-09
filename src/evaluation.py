@@ -103,7 +103,7 @@ class Model_Evaluator(object):
                     degrade+=score_list[-1]
             result['robustness']=str(100*(score_list[0]-degrade/(len(score_list)-1))/score_list[0])
             # TODO: properly implement this
-            result['suggestion'] = 'Your model can be made more robust by training it with adversarial examples.'
+            #result['suggestion'] = 'Your model can be made more robust by training it with adversarial examples.'
       
         return result
         

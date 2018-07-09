@@ -11,7 +11,6 @@ from evaluation import Model_Evaluator
 
 try:
     s3 = boto3.resource('s3')
-    s3_client = boto3.client('s3')
     bucket = s3.Bucket('advex')
 
     sqs = boto3.client('sqs')
@@ -21,41 +20,6 @@ except:
     # should raise error here
     warnings.warn("sqs not started", UserWarning)
 
-# SAMPLE_FEEDBACK = {
-#   "robustness": "9",
-#   "rating": "Good",
-#   "details": {
-#       "original_accuracy": "98.55%",
-#       "attack_results": [
-#           {
-#               "attack_method": "FGSM",
-#               "accuracy": "80.05%",
-#               "confidence": "95%"
-#           },
-#           {
-#               "attack_method": "Basic Iterative Method",
-#               "accuracy": "92.10%",
-#               "confidence": "91%"
-#           },
-#           {
-#               "attack_method": "Carlini Wagner",
-#               "accuracy": "94.10%",
-#               "confidence": "93%"
-#           },
-#           {
-#               "attack_method": "Momentum Iterative Method",
-#               "accuracy": "94.10%",
-#               "confidence": "93.7%"
-#           },
-#           {
-#               "attack_method": "DeepFool",
-#               "accuracy": "90.10%",
-#               "confidence": "89%"
-#           }
-#       ]
-#   },
-#   "suggestion": "Your model can be made more robust by training it with some of the adversarial examples which you can download for free from your dashboard."
-# }
 
 
 def update_feedback(submission_id, feedback=None, status=None):
@@ -72,49 +36,40 @@ def evaluate_job(job):
     print('Evaluating model.')
 
     feedback={}
-    submission_id = job['submission_id']
-    model_file = job['s3_model_key']
-    index_file = job['s3_index_key']
-
-    update_feedback(submission_id, status='Running')
+    try:
+        submission_id = job['submission_id']
+        model_file = job['s3_model_key']
+        index_file = job['s3_index_key']
     
-    #Check 1: File extension
-    if not model_file.endswith('.h5'):
+        update_feedback(submission_id, status='Running')
+        
+        if not model_file.endswith('.h5'):
+            raise Exception('Model file has to have .h5 as its extension.')
+
         if not index_file.endswith('.json'):
-            feedback = {"error": "Model file has to have .h5 as its extension. Index file has to have .json as its extension"}
-        else:
-            feedback = {"error": "Model file has to have .h5 as its extension."}
-    else:
-        if not index_file.endswith('.json'):
-            feedback = {"error": "Index file has to have .json as its extension"}       
+            raise Exception('Index file has to have .json as its extension')
+        
     
-    response_model = s3_client.head_object(Bucket='advex', Key=model_file)
-    response_index = s3_client.head_object(Bucket='advex', Key=index_file)
-
-    model_size=response_model['ContentLength']
-    index_size=response_index['ContentLength']
-
-    bucket.download_file(model_file, model_file)
-    bucket.download_file(index_file, index_file)
-
-    #Check 2: File Size Check
-    if not feedback:
+    
+        bucket.download_file(model_file, model_file)
+        bucket.download_file(index_file, index_file)
+    
+    
+        model_size=os.path.getsize(model_file)
+        index_size=os.path.getsize(index_file)
+        #Check 2: File Size Check
         if model_size > 1073741824: # 1 GiB
-            if index_size > 102400:
-                feedback = {"error": ".h5 file can't be bigger than 1GB and .json file can't be bigger than 100KB."}
-            else:
-                feedback = {"error": ".h5 file can't be bigger than 1GB."}
-        else:
-            if index_size > 102400:
-                feedback = {"error": ".json file can't be bigger than 100KB."}
-    
-    if not feedback:
-        #The model file and index file are perfectly fine.
-        try:
+            raise Exception('.h5 file can not be bigger than 1GB.')
+  
+        if index_size > 102400:
+            raise Exception('.json file can not be bigger than 100KB.')
+        
+        if not feedback:
+            #The model file and index file are perfectly fine.
             model=Model_Evaluator(model_file,index_file)
             feedback=model.evaluate()
-        except Exception as exc:
-            feedback['error']=exc.__str__()
+    except Exception as exc:
+        feedback['error']=exc.__str__()
     
     print(feedback)
     status = ('Failed' if 'error' in feedback else 'Finished')
