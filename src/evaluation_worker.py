@@ -10,8 +10,6 @@ from evaluation import Model_Evaluator
 
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
-response_model = s3_client.head_object(Bucket='advex', Key='vgg16.h5')
-response_index = s3_client.head_object(Bucket='advex', Key='imagenet_class_index.json')
 bucket = s3.Bucket('advex')
 
 sqs = boto3.client('sqs')
@@ -83,13 +81,13 @@ def evaluate_job(job):
             feedback = {"error": "Model file has to have .h5 as its extension."}
     else:
         if not index_file.endswith('.json'):
-            feedback = {"error": "Index file has to have .json as its extension"}       
-            
-    #bucket.download_file(model_file, model_file)
-    #bucket.download_file(index_file, index_file)
+            feedback = {"error": "Index file has to have .json as its extension"}      
     
-    model_size=response_model['ContentLength']
-    index_size=response_index['ContentLength']
+    bucket.download_file(model_file, model_file)
+    bucket.download_file(index_file, index_file)
+    
+    model_size=os.path.getsize(model_file)
+    index_size=os.path.getsize(index_file)
     #Check 2: File Size Check
     if not feedback:
         if model_size > 1073741824: # 1 GiB
