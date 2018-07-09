@@ -39,8 +39,10 @@ class Model_Evaluator(object):
     #Private functions that only be called by init
     def load_set(self,set_):
         my_dict={}
-        inputs=np.load(open('./image_data_final/evaluate_input_'+set_+'.npy'))
-        labels=np.load(open('./image_data_final/evaluate_label_'+set_+'.npy'))
+        # inputs=np.load(open('./image_data_final/evaluate_input_'+set_+'.npy'))
+        # labels=np.load(open('./image_data_final/evaluate_label_'+set_+'.npy'))
+        inputs=np.load(open('./image_data_small/evaluate_input_'+set_+'.npy'))
+        labels=np.load(open('./image_data_small/evaluate_label_'+set_+'.npy'))
         for key,input_ in zip(labels,inputs):
             if key not in my_dict:
                 my_dict[key]=[]
