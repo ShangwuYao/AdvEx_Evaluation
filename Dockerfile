@@ -11,7 +11,6 @@ ADD ./__init__.py /app
 ADD ./requirements.txt /app
 ADD ./Dockerfile /app
 ADD ./start.sh /app
-ADD ./production.env /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
