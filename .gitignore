@@ -1,7 +1,6 @@
 /.DS_Store
 /*/.DS_Store
 
-*.env
 config/
 
 # Created by https://www.gitignore.io/api/python
