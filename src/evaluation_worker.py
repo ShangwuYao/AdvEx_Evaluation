@@ -12,7 +12,7 @@ from evaluation import Model_Evaluator
 try:
     s3 = boto3.resource('s3')
     bucket = s3.Bucket('advex')
-
+    s3_client = boto3.client('s3')
     sqs = boto3.client('sqs')
     resp = sqs.get_queue_url(QueueName='advex')
     queue_url = resp['QueueUrl']
@@ -50,24 +50,25 @@ def evaluate_job(job):
             raise Exception('Index file has to have .json as its extension')
         
     
+        response_model = s3_client.head_object(Bucket='advex', Key=model_file)
+        response_index = s3_client.head_object(Bucket='advex', Key=index_file)
+
+        model_size=response_model['ContentLength']
+        index_size=response_index['ContentLength']
     
-        bucket.download_file(model_file, model_file)
-        bucket.download_file(index_file, index_file)
-    
-    
-        model_size=os.path.getsize(model_file)
-        index_size=os.path.getsize(index_file)
         #Check 2: File Size Check
         if model_size > 1073741824: # 1 GiB
             raise Exception('.h5 file can not be bigger than 1GB.')
   
         if index_size > 102400:
             raise Exception('.json file can not be bigger than 100KB.')
+ 
+        bucket.download_file(model_file, model_file)
+        bucket.download_file(index_file, index_file)
         
-        if not feedback:
-            #The model file and index file are perfectly fine.
-            model=Model_Evaluator(model_file,index_file)
-            feedback=model.evaluate()
+        #The model file and index file are perfectly fine.
+        model=Model_Evaluator(model_file,index_file)
+        feedback=model.evaluate()
     except Exception as exc:
         feedback['error']=exc.__str__()
     

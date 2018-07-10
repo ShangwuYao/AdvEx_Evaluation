@@ -88,7 +88,7 @@ class Model_Evaluator(object):
         #The deployment should only have one model in self.models
         for model_path in self.models:
             degrade,score_list=0.0,[]
-            result={'robustness':None,'details':[],'graph_link':None,'suggestion':None}
+            result={'robustness':None,'details':[]}
             for path in self.set_path:
                 inputs=self.load_set(path)
                 score={}
