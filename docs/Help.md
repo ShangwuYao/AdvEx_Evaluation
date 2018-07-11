@@ -27,15 +27,13 @@ The key here should be the class index and the value should be the ImageNet uniq
 
 We will conduct a black-box attack on your model. In other words, all the images are pregenerated, and we use [VGG16](https://arxiv.org/abs/1409.1556) to generate all the adversarial images. Using block-bax attacks as well as minumum pertubation images mentioned below, we esstianlly provide the most optimistic estimation of your model.
 
-After a thorough literature review of the attack methods of the [Cleverhans library](https://github.com/tensorflow/cleverhans), the following attack methods have been chosen to check the robustness of your model.
+We have used attack methods implemented by an open sourced adversarial example library, [Cleverhans](https://github.com/tensorflow/cleverhans). After a thorough literature review of the attack methods in this library, the following attack methods have been chosen to check the robustness of your model.
 
   - FastGradientMethod
   - BasicIterativeMethod
   - MomentumIterativeMethod
-  - CarliniWagnerL2
-  - MadryEtAl
 
-A brief decription of each of the attack methods and a link to their published paper has been given below.
+A brief decription of each of the attack methods we have used and a link to a paper describing details of that attack method have been given below.
 
 # Inputs to your models
 
@@ -51,14 +49,8 @@ This is the basic algorithm for generating adversarial examples. It is also call
 ##### BasicIterativeMethod
 Link: https://arxiv.org/pdf/1607.02533.pdf
 It is an extension of the FastGradientMethod in the sense that it is applied multiple times with small step size, and pixel values of intermediate results are clipped after each step to ensure that they are in an ε-neighbourhood of the original image.
-##### CarliniWagnerL2
-Link: https://arxiv.org/abs/1608.04644
-It is an iterative attack that finds adversarial examples on many defenses that are robust to other attacks.
 ##### MomentumIterativeMethod
 Link: https://arxiv.org/pdf/1710.06081.pdf
 By integrating the momentum term into the iterative process for attacks, this attack method can stabilize update directions and escape from poor local maxima during the iterations, resulting in more transferable adversarial examples.
-##### MadryEtAl
-Link: https://arxiv.org/pdf/1706.06083.pdf
-This performs the Projected Gradient Descent Algorithm to attack the model.
 
  A description of the parameters of each of these attack methods can be found [here](http://cleverhans.readthedocs.io/en/latest/source/attacks.html).
