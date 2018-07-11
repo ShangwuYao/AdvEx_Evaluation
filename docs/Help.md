@@ -35,13 +35,6 @@ We have used attack methods implemented by an open sourced adversarial example l
 
 A brief decription of each of the attack methods we have used and a link to a paper describing details of that attack method have been given below.
 
-# Inputs to your models
-
-It makes no sense to choose the images that are misclassified by the model in the first place. Therefore, we randomly choose 1000 images that belong to the 1000 categories from the ILSVRC 2012 validation set, which are all correctly classified by the model.
-
-One important thing to mention is that we are finding the minumum pertubation for each of the image that can be misclassified by the model. To achieve this effect, we first set the noise level (pertubation) of a image to be the middle of range 0.0 and 1.0. If the image is misclassified, we shrink the upper bound, otherwise, we raise the lower bound so on and so forth. The number of binary search iterations is set to 10 for every image.
-
-All the images are preprocessed before feeding to the network. Here we simply minus the images by 127.5 pixel value, which results in the range from -127.5 to 127.5 for every image. It is therefore important to note that the accuracy might vary depends on how different you preprocess the images when training your model.
 
 ##### FastGradientMethod
 Link: https://arxiv.org/pdf/1412.6572.pdf
@@ -54,3 +47,11 @@ Link: https://arxiv.org/pdf/1710.06081.pdf
 By integrating the momentum term into the iterative process for attacks, this attack method can stabilize update directions and escape from poor local maxima during the iterations, resulting in more transferable adversarial examples.
 
  A description of the parameters of each of these attack methods can be found [here](http://cleverhans.readthedocs.io/en/latest/source/attacks.html).
+
+# Inputs to your models
+
+It makes no sense to choose the images that are misclassified by the model in the first place. Therefore, we randomly choose 1000 images that belong to the 1000 categories from the ILSVRC 2012 validation set, which are all correctly classified by the model.
+
+One important thing to mention is that we are finding the minumum pertubation for each of the image that can be misclassified by the model. To achieve this effect, we first set the noise level (pertubation) of a image to be the middle of range 0.0 and 1.0. If the image is misclassified, we shrink the upper bound, otherwise, we raise the lower bound so on and so forth. The number of binary search iterations is set to 10 for every image.
+
+All the images are preprocessed before feeding to the network. Here we simply minus the images by 127.5 pixel value, which results in the range from -127.5 to 127.5 for every image. It is therefore important to note that the accuracy might vary depends on how different you preprocess the images when training your model.
