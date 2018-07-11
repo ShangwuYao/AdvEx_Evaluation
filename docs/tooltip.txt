@@ -3,10 +3,10 @@
 Robustness score:
 
 We calculate the score by evaluating the accuracy degrade of your model.
-Let's say we named the accuracy of the clean dataset to be Original_Accuracy and the accuracy of each attack method to be Attack_Accuracy, then the accuracy degrade of each attack method is calculated by (Original_Accuracy-Attack_Accuracy)/Original_Accuracy, and the final robustness score is the average of the accuracy degrades.
+Let's say we named the accuracy of the clean dataset to be Original_Accuracy and the accuracy of each attack method to be Attack_Accuracy, then the accuracy degrade of each attack method is calculated by (Original_Accuracy-Attack_Accuracy)/Original_Accuracy, and the final robustness score is the average of all accuracy degrades.
 If the attack doesn't affect you model, which means the Attack_Accuracy is nearly the same as the Original_Accuracy, then the score should be close to zero. Therefore, as you can imagine, the lower the score, the better.
 
 Confidence:
 
-Confidence represents how confident is your model when it makes a prediction. Here we simply interpret the output of the final softmax layer as a probability distribution. The highes score of the softmax layer is the model's prediction, and the score itself is treated as the confidence.
+Confidence represents how confident is your model when it makes a prediction. Here we simply interpret the output of the final softmax layer as a probability distribution. The highest score of the softmax layer is the model's prediction, and the score itself is treated as the confidence.
 
