@@ -88,7 +88,7 @@ class Model_Evaluator(object):
         #The deployment should only have one model in self.models
         for model_path in self.models:
             degrade,score_list=0.0,[]
-            result={'robustness':None,'rating':None,'details':[],'graph_link':None,'suggestion':None}
+            result={'robustness':None,'details':[]}
             for path in self.set_path:
                 inputs=self.load_set(path)
                 score={}
@@ -102,8 +102,7 @@ class Model_Evaluator(object):
                 if len(score_list)>1:
                     degrade+=score_list[-1]
             result['robustness']=str(100*(score_list[0]-degrade/(len(score_list)-1))/score_list[0])
-            # TODO: properly implement this
-            result['suggestion'] = 'Your model can be made more robust by training it with adversarial examples.'
+
       
         return result
         
