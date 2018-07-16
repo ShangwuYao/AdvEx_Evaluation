@@ -9,3 +9,4 @@ If the attack doesn't affect you model, which means the Attack_Accuracy is nearl
 Confidence:
 
 Confidence represents how confident is your model when it makes a prediction. Here we simply interpret the output of the final softmax layer as a probability distribution. The highest score of the softmax layer is the model's prediction, and the score itself is treated as the confidence.
+
