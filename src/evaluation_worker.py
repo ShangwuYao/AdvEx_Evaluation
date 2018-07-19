@@ -71,6 +71,13 @@ def evaluate_job(job):
         feedback=model.evaluate()
     except Exception as exc:
         feedback['error']=exc.__str__()
+
+    try:
+        os.remove(model_file)
+        os.remove(index_file)
+    except Exception as e:
+        # TODO: logging
+        pass
     
     print(feedback)
     status = ('Failed' if 'error' in feedback else 'Finished')
