@@ -1,0 +1,16 @@
+{"FastGradientMethod":{
+	"alias":"FGSM",
+	"attack_params":{"eps":null, "clip_min":-127, "clip_max":128}
+},
+	"BasicIterativeMethod":{
+		"alias":"I-FGSM",
+		"attack_params":{"eps":null, "clip_min":-127, "clip_max":128}
+	},
+	"MomentumIterativeMethod":{
+		"alias":"Mi-FGSM",
+		"attack_params":{"eps":null, "clip_min":-127, "clip_max":128}
+	},
+	"Original":{
+		"attack_params":{"eps":null, "clip_min":-127, "clip_max":128}
+	}
+}
