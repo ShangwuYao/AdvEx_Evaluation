@@ -12,18 +12,10 @@ import argparse
 from keras.models import load_model
 
 
-#parser = argparse.ArgumentParser()
-#parser.add_argument("--model",help="model path",default='.')
-#parser.add_argument("--index",help="index path",default='./imagenet_class_index.json')
-#
-#
-#
-#args = parser.parse_args()
-
 
 
 '''
-The class takes model's path and its json file's path as input
+The class takes model's path, index mapping and the path to AE as input
 '''
 class Model_Evaluator(object):
     def __init__(self, model_path, json_path, AE_path='./image_final/'):
@@ -37,6 +29,7 @@ class Model_Evaluator(object):
         
         self.class_index = json.load(open(json_path))
         self.class_set = set(self.class_index.values())  
+        
     #Private functions that only be called by init
     def load_set(self, set_):
         my_dict = {}
@@ -59,15 +52,13 @@ class Model_Evaluator(object):
         for label in argmax:
             decode.append(self.class_index[str(label)]) 
         return np.array(decode), confidence
-        
+    
+    #The output of this model should be a dictionary containing all the results
     def evaluate(self):
-        '''
-        The output of this model should be accuracy
-        '''
+        
+        #Calculate accuracy using this method
         def calculate_acc(data, model):
-            '''
-            data is a dictionary where y is the key and X are the value
-            '''
+            
             right, total, confidence = 0, 0, 0.0
             for key in data:
                 if len(data[key]) == 0 or key not in self.class_set:
@@ -80,19 +71,19 @@ class Model_Evaluator(object):
                 total += len(data[y])
                 confidence += con
             return float(right*100)/total, confidence*100/total
-            #print clean_predict.shape
         
         
         
         result = None
-        #The deployment should only have one model in self.models
+        #Can specify more than one models here for future development
+        #Documentation of all the scores calculated can be found in our github
         for model_path in self.models:
             degrade, score_list = 0.0, []
             result = {'robustness':None,'details':[]}
             for path in self.set_path:
                 inputs = self.load_set(path)
                 score = {}
-                acc,confidence = calculate_acc(inputs,load_model(model_path)) ##Need change after deployment
+                acc,confidence = calculate_acc(inputs,load_model(model_path)) 
                 score['attack_method'] = path.upper()
                 score['accuracy'] = str(acc)+'%'
                 score['confidence'] = str(confidence)+'%'
@@ -108,20 +99,13 @@ class Model_Evaluator(object):
         
             
                 
-###Your work
-##specify what is the input here
-
-#result={}
 #try:
-model = Model_Evaluator('./vgg16.h5','./imagenet_class_index.json')
-result = model.evaluate()
-print(result)
+#    model = Model_Evaluator('./vgg16.h5','./imagenet_class_index.json')
+#    result = model.evaluate()
+#    print(result)
 #except Exception as exc:
 #    result['message']=exc.__str__()
-#
-#output=json.dumps(result)
-    
 
-##What is the output of the evaluate
+
         
     

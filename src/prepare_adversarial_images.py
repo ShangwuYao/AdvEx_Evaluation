@@ -52,7 +52,6 @@ def decode_predictions(class_index,predict):
 def binary_search_epsilon(model, class_index, attack, input_path, labels, labels_index, output_clean=False,
                           binary_iter=1, attack_params=None, num_generate=1):
 
-    ##Currently, we are planning to only take 10 images per class to generate AE
     if not attack_params:
         attack_params={'eps':None, 'clip_min':-127, 'clip_max':128}
 
@@ -63,7 +62,7 @@ def binary_search_epsilon(model, class_index, attack, input_path, labels, labels
             continue
         
         lbl = int(img.split('_')[-1].split('.')[0])-1
-        class_lbl = labels_index[labels[lbl]]  ##Assume the value is tuple and the first index is the id
+        class_lbl = labels_index[labels[lbl]]  
         if class_lbl not in my_dict:
             my_dict[class_lbl] = []
             
