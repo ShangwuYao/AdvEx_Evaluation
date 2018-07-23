@@ -98,13 +98,13 @@ class Model_Evaluator(object):
         return result
         
             
-                
-#try:
-#    model = Model_Evaluator('./vgg16.h5','./imagenet_class_index.json')
-#    result = model.evaluate()
-#    print(result)
-#except Exception as exc:
-#    result['message']=exc.__str__()
+if __name__ == '__main__':             
+    try:
+        model = Model_Evaluator('./vgg16.h5','./imagenet_class_index.json')
+        result = model.evaluate()
+        print(result)
+    except Exception as exc:
+        result['message']=exc.__str__()
 
 
         
