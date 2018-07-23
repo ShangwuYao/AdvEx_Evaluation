@@ -7,6 +7,7 @@ the basics of adversarial examples. For users that are not familiar with adversa
 here is some useful resources to learn about the topic.
 
 [OpenAI blog](https://blog.openai.com/adversarial-example-research/)
+
 [Explaining and Harnessing Adversarial Examples](https://arxiv.org/abs/1412.6572)
 
 ## Usage
