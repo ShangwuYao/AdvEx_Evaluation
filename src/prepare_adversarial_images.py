@@ -69,7 +69,7 @@ def binary_search_epsilon(model, class_index, attack, input_path, labels, labels
 
         input_ = preprocess_image(input_path+'/'+img)
         
-        predict = decode_predictions(class_index,model.predict(input_))
+        predict = decode_predictions(class_index, model.predict(input_))
         
         if predict != class_lbl:
             print('Wrong classification, continue')
