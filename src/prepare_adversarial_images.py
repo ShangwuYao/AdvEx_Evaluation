@@ -105,30 +105,8 @@ def binary_search_epsilon(model, class_index, attack, input_path, labels, labels
         if num >= num_generate:
             break
     return my_dict
-    
-    
 
-if __name__ == '__main__':
-    sess = tf.Session()
-    keras.backend.set_session(sess)
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", help="Provide the path to the model", default='./vgg16.h5')
-    parser.add_argument("--class_index", help="Provide index-label mapping of the model", default='./imagenet_class_index.json')
-    
-    parser.add_argument("--num_step", type=int, help="number of binary search step perform to search for noise", default=5)
-    parser.add_argument("--num_generate", type=int, help="number of adversarail images to generate", default=100)
-
-    parser.add_argument("--data_input", help="path to the directory that contains the image data", default='./image_data/')
-    parser.add_argument("--data_label", help="path to the file that contains label", default='./ILSVRC2012_validation_ground_truth.txt')
-    parser.add_argument("--data_mapping", help="the mapping of index to label of the data", default='./imagenet_class_index.json')
-
-    parser.add_argument("--config", help="config file that contains attack method and parameters", default='./config.json')
-    parser.add_argument("--output_original", action='store_true', help="whether to output the orginal images that is clasified correctly")
-    parser.add_argument("--output_path", help="path to where to store the output", default='./image_final/')
-
-    
-    args = parser.parse_args()
+def main(args):
     
     model = load_model(args.model)
     class_index = json.load(open(args.class_index))
@@ -137,8 +115,6 @@ if __name__ == '__main__':
     data_input_path = args.data_input #To save memory, We only load images when we are processing them.
     data_label = load_label(args.data_label)
     data_mapping = json.load(open(args.data_mapping))
-    
-    
     
     if args.output_original:
         result_dict = binary_search_epsilon(model, class_index, None, data_input_path, data_label, data_mapping, 
@@ -163,6 +139,32 @@ if __name__ == '__main__':
         
         description=(attack if 'alias' not in config[attack] else config[attack]['alias'])
         output_file(result_dict, description, args.output_path)
+    
+    
+
+if __name__ == '__main__':
+    sess = tf.Session()
+    keras.backend.set_session(sess)
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", help="Provide the path to the model", default='./vgg16.h5')
+    parser.add_argument("--class_index", help="Provide index-label mapping of the model", default='./imagenet_class_index.json')
+    
+    parser.add_argument("--num_step", type=int, help="number of binary search step perform to search for noise", default=5)
+    parser.add_argument("--num_generate", type=int, help="number of adversarail images to generate", default=100)
+
+    parser.add_argument("--data_input", help="path to the directory that contains the image data", default='./image_data/')
+    parser.add_argument("--data_label", help="path to the file that contains label", default='./ILSVRC2012_validation_ground_truth.txt')
+    parser.add_argument("--data_mapping", help="the mapping of index to label of the data", default='./imagenet_class_index.json')
+
+    parser.add_argument("--config", help="config file that contains attack method and parameters", default='./config.json')
+    parser.add_argument("--output_original", action='store_true', help="whether to output the orginal images that is clasified correctly")
+    parser.add_argument("--output_path", help="path to where to store the output", default='./image_final/')
+
+    
+    args = parser.parse_args()
+        
+    main(args)
         
         
         
