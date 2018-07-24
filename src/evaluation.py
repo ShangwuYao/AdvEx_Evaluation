@@ -22,7 +22,7 @@ class Model_Evaluator(object):
         super(Model_Evaluator, self).__init__()
         
         #Grab the attack method using alias. Change the set below to choose which attack to evaluate
-        self.set_path = ['Original', 'FGSM', 'I-FGSM', 'Mi-FGSM']
+        self.set_path = ['CLEAN', 'FGSM', 'I-FGSM', 'Mi-FGSM']
         self.AE_path = AE_path
         
         self.models = [model_path]

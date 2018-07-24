@@ -119,7 +119,7 @@ def main(args):
     if args.output_original:
         result_dict = binary_search_epsilon(model, class_index, None, data_input_path, data_label, data_mapping, 
                                             output_clean=True, num_generate=args.num_generate)
-        output_file(result_dict, 'Original', args.output_path)
+        output_file(result_dict, 'CLEAN', args.output_path)
     #Config file should be a dictionary with key being the attack method (exact name) and value
     #being a dictionary contains field like alias and params(params is required)
     for attack in config:
