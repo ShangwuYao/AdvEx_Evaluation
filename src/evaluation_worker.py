@@ -7,6 +7,8 @@ import warnings
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from db import db, Submission
 from evaluation import Model_Evaluator
+import gc
+gc.set_debug(gc.DEBUG_LEAK)
 
 
 try:
