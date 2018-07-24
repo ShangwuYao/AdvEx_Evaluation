@@ -69,7 +69,7 @@ def evaluate_job(job):
         bucket.download_file(index_file, index_file)
         
         #The model file and index file are perfectly fine.
-        model=Model_Evaluator(model_file,index_file)
+        model=Model_Evaluator(model_file, index_file, AE_path='./image_data_small/')
         feedback=model.evaluate()
     except Exception as exc:
         feedback['error']=exc.__str__()
