@@ -18,7 +18,7 @@ from keras.models import load_model
 The class takes model's path, index mapping and the path to AE as input
 '''
 class Model_Evaluator(object):
-    def __init__(self, model_path, json_path, AE_path='./image_final/'):
+    def __init__(self, model_path, json_path, AE_path='./image_data_final/'):
         super(Model_Evaluator, self).__init__()
         
         #Grab the attack method using alias. Change the set below to choose which attack to evaluate
