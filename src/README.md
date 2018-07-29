@@ -27,7 +27,7 @@ We use [ILSVRC](http://www.image-net.org/challenges/LSVRC/2012/index) validation
 
 Just like how ImageNet validation data is organized, images are named with index, i.e. `ILSVRC2012_val_00025012.JPEG`. Here we assume that the index `25012` is the last part of the name. On the other hand, a text file stores the labels of each image starting from index 0.
 
-Note that if the index to label mapping of the data is different from that of the model, you need to provide the mapping of index to label of the data as well. In our case, the mapping of the model is different from that of the data. For example, `96` means `toucan` in the model but `chimpanzee` in the data.
+Note that if the index to label mapping of the data is different from that of the model, you need to provide the mapping of index to label of the data as well. In our case, the mapping of the model is different from that of the data. For example, the label for index `96` is `toucan` in the model but `chimpanzee` in the data.
 
 ### Config file
 
