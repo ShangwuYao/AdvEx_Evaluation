@@ -31,7 +31,7 @@ Note that if the index to label mapping of the data is different from that of th
 
 ### Config file
 
-Config file specifies the attack methods to use and their parameters. We have provided an example in the `config.py`.
+Config file specifies the attack methods to use and their parameters. We have provided an example in the `attack_method_config.py`.
 
 ## Example
 
