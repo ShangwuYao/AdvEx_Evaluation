@@ -1,6 +1,6 @@
 # Evaluation Core Algorithm
 
-This project provides a pipeline for generating adversarial images using different attack methods. The images can then be used to evaluate the robustness of machine learning models. We use the implementations from [CleverHans library](https://github.com/tensorflow/cleverhans#setting-up-cleverhans) and perform binary search to generate images with the smallest peturbation needed to form an adversarial example. More details can be found at [https://advex.org](https://advex.org)
+This project provides a pipeline for generating adversarial images using different attack methods. The images can then be used to evaluate the robustness of machine learning models. We use the attack implementations from [CleverHans library](https://github.com/tensorflow/cleverhans#setting-up-cleverhans) and perform binary search to generate images with the smallest peturbation needed to form an adversarial example. More details can be found at [https://advex.org](https://advex.org)
 
 This project is intended for users who already have some background in machine learning and understand
 the basics of adversarial examples. For users that are not familiar in this field,
