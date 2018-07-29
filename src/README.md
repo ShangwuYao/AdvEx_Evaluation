@@ -19,7 +19,7 @@ Obtained using [`model.save()` method](https://keras.io/getting-started/faq/#how
 
 ### Index to label mapping of your model
 
-We have provided an example in [`imagenet_class_index.json`](). Unlike the original JSON file provided by ImageNet, the value should only be a string that represents the classID instead of a list.
+We have provided an example in [`imagenet_class_index.json`](TODO). Unlike the original JSON file provided by ImageNet, the value should only be a string that represents the classID instead of a list.
 
 ### Data
 
