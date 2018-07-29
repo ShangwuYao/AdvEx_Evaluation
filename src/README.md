@@ -1,6 +1,6 @@
 # Evaluation Core Algorithm
 
-This project provides a pipeline for generating adversarial images using different attack methods. The images can then be used to evaluate the robustness of machine learning models. We use the implementations from [CleverHans library](https://github.com/tensorflow/cleverhans#setting-up-cleverhans) and perform binary search to generate images with the smallest peturbation needed to form an adversarial example. More details can be found at [https://advex.org](https://advex.org)
+This project provides a pipeline for generating adversarial images using different attack methods. The images can then be used to evaluate the robustness of machine learning models. We use the attacks methods from [CleverHans library](https://github.com/tensorflow/cleverhans#setting-up-cleverhans) and perform binary search to generate images with the smallest peturbation needed to form an adversarial example. More details can be found at [https://advex.org](https://advex.org).
 
 This project is intended for users who already have some background in machine learning and understand
 the basics of adversarial examples. For users that are not familiar in this field,
@@ -19,7 +19,7 @@ Obtained using [`model.save()` method](https://keras.io/getting-started/faq/#how
 
 ### Index to label mapping of your model
 
-We have provided an example in `imagenet_class_index.json`. Unlike the origianl JSON file provided by ImageNet, the value should only be a string that represents the classID instead of a list.
+We have provided an example in [`imagenet_class_index.json`](https://github.com/ShangwuYao/AdvEx_Evaluation/blob/master/src/imagenet_class_index.json). Unlike the original JSON file provided by ImageNet, the value should only be a string that represents the classID instead of a list.
 
 ### Data
 
@@ -27,11 +27,11 @@ We use [ILSVRC](http://www.image-net.org/challenges/LSVRC/2012/index) validation
 
 Just like how ImageNet validation data is organized, images are named with index, i.e. `ILSVRC2012_val_00025012.JPEG`. Here we assume that the index `25012` is the last part of the name. On the other hand, a text file stores the labels of each image starting from index 0.
 
-Note that if the index to label mapping of the data is different from that of the model, you need to provide the mapping of index to label of the data as well. In our case, the mapping of the model is differnt from that of the data. For example, `96` means `toucan` in the model but `chimpanzee` in the data.
+Note that if the index to label mapping of the data is different from that of the model, you need to provide the mapping of index to label of the data as well. In our case, the mapping of the model is different from that of the data. For example, the label for index `96` is `toucan` in the model but `chimpanzee` in the data.
 
 ### Config file
 
-Config file specifies the attack methods to use and their parameters. We have provided an example in the `config.py`.
+Config file specifies the attack methods to use and their parameters. We have provided an example in the [`config.json`](https://github.com/ShangwuYao/AdvEx_Evaluation/blob/master/src/config.json).
 
 ## Example
 
