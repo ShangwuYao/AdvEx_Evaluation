@@ -47,13 +47,13 @@ One example of running the script is shown below.
 python prepare_adversarial_images.py --model ./vgg16.h5 --class_index ./imagenet_class_index.json --num_step 1 --num_generate 10 --data_input . --data_label ILSVRC2012_validation_ground_truth.txt --data_mapping ./class_index.json --config config.json --output_original --output_path ./image_final/
 ```
 
-Our orginal setting is to use three attack methods (FGSM, I-FGSM, MI-FGSM) to generate adversarial exampels.
+We use three attack methods (FGSM, I-FGSM, MI-FGSM) to generate adversarial exampels.
 
 ## Evaluation
 
-We implemented a evaluation module in `evaluation.py`. You need to provide your model that is saved by Keras's `model.save()` function ,a JSON file that contains the mapping of index to label, and the path to where the adversarial images are stored.
+We implemented a evaluation module in `evaluation.py`. You need to provide your model that is saved by Keras's `model.save()` function, a JSON file that contains the mapping of index to label, and the path to where the adversarial images are stored.
 
-You can also change which attack methods you want to evaluate on by simply alter the list inside the init function
+You can also change which attack methods you want to evaluate on by simply altering the list inside the init function
 
 ```
 self.set_path = ['Original', 'FGSM', 'I-FGSM', 'Mi-FGSM']
