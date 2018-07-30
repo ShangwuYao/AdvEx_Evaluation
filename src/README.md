@@ -47,7 +47,7 @@ One example of running the script is shown below.
 python prepare_adversarial_images.py --model ./vgg16.h5 --class_index ./imagenet_class_index.json --num_step 1 --num_generate 10 --data_input . --data_label ILSVRC2012_validation_ground_truth.txt --data_mapping ./class_index.json --config config.json --output_original --output_path ./image_final/
 ```
 
-We use three attack methods (FGSM, I-FGSM, MI-FGSM) to generate adversarial exampels.
+We use three attack methods (FGSM, I-FGSM, MI-FGSM) to generate adversarial examples.
 
 ## Evaluation
 
