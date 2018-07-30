@@ -51,7 +51,7 @@ We use three attack methods (FGSM, I-FGSM, MI-FGSM) to generate adversarial exam
 
 ## Evaluation
 
-We implemented a evaluation module in `evaluation.py`. You need to provide your model that is saved by Keras's `model.save()` function, a JSON file that contains the mapping of index to label, and the path to where the adversarial images are stored.
+We implemented a evaluation module in [`evaluation.py`](https://github.com/ShangwuYao/AdvEx_Evaluation/blob/master/src/evaluation.py). You need to provide your model that is saved by Keras's `model.save()` function, a JSON file that contains the mapping of index to label, and the path to where the adversarial images are stored.
 
 You can also change which attack methods you want to evaluate on by simply altering the list inside the init function
 
